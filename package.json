@@ -3,24 +3,53 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.79.0",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "@tiptap/extension-code-block": "^3.20.4",
+    "@tiptap/extension-heading": "^3.20.4",
+    "@tiptap/extension-horizontal-rule": "^3.20.4",
+    "@tiptap/extension-image": "^3.20.4",
+    "@tiptap/extension-link": "^3.20.4",
+    "@tiptap/extension-placeholder": "^3.20.4",
+    "@tiptap/pm": "^3.20.4",
+    "@tiptap/react": "^3.20.4",
+    "@tiptap/starter-kit": "^3.20.4",
+    "bcryptjs": "^3.0.3",
     "next": "16.1.7",
+    "next-auth": "^4.24.13",
+    "pg": "^8.20.0",
+    "prisma": "^7.5.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "three": "^0.183.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/pg": "^8.18.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.183.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

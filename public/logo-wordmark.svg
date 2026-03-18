@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" fill="none">
+  <!-- Icon -->
+  <circle cx="52" cy="60" r="48" fill="#16a34a"/>
+  <g transform="translate(52, 60)">
+    <path d="M0 18 L0 -5" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-1.5 -3 C-18 -14, -28 -35, -14 -45 C-3 -52, 3 -38, -1.5 -20 Z" fill="white" opacity="0.95"/>
+    <path d="M0 -7 C-10 -24, -12 -48, 0 -56 C12 -48, 10 -24, 0 -7 Z" fill="white"/>
+    <path d="M1.5 -3 C18 -14, 28 -35, 14 -45 C3 -52, -3 -38, 1.5 -20 Z" fill="white" opacity="0.95"/>
+    <path d="M-3.5 1 C-20 -5, -26 -20, -17 -27 C-10 -31, -5 -20, -3.5 -10 Z" fill="white" opacity="0.7"/>
+    <path d="M3.5 1 C20 -5, 26 -20, 17 -27 C10 -31, 5 -20, 3.5 -10 Z" fill="white" opacity="0.7"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="120" y="76" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="52" font-weight="700" fill="#111827" letter-spacing="-1">
+    Parsley
+  </text>
+
+  <!-- Tagline -->
+  <text x="122" y="98" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="14" font-weight="500" fill="#9ca3af" letter-spacing="3">
+    AI-FIRST CMS
+  </text>
+</svg>

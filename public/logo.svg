@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="96" fill="#16a34a" />
+
+  <!-- Parsley leaf shape - stylized as a code/cursor motif -->
+  <g transform="translate(100, 100)">
+    <!-- Center stem -->
+    <path d="M0 35 L0 -10" stroke="white" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Left leaf -->
+    <path d="M-2 -5 C-25 -20, -40 -50, -20 -65 C-5 -75, 5 -55, -2 -30 Z" fill="white" opacity="0.95"/>
+
+    <!-- Center leaf (taller) -->
+    <path d="M0 -10 C-15 -35, -18 -70, 0 -82 C18 -70, 15 -35, 0 -10 Z" fill="white"/>
+
+    <!-- Right leaf -->
+    <path d="M2 -5 C25 -20, 40 -50, 20 -65 C5 -75, -5 -55, 2 -30 Z" fill="white" opacity="0.95"/>
+
+    <!-- Small accent leaves -->
+    <path d="M-5 0 C-30 -8, -38 -30, -25 -40 C-15 -45, -8 -30, -5 -15 Z" fill="white" opacity="0.7"/>
+    <path d="M5 0 C30 -8, 38 -30, 25 -40 C15 -45, 8 -30, 5 -15 Z" fill="white" opacity="0.7"/>
+  </g>
+
+  <!-- Subtle tech dots on leaves -->
+  <circle cx="100" cy="40" r="2" fill="#16a34a" opacity="0.4"/>
+  <circle cx="85" cy="55" r="1.5" fill="#16a34a" opacity="0.3"/>
+  <circle cx="115" cy="55" r="1.5" fill="#16a34a" opacity="0.3"/>
+</svg>

@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# Large 3D model files (users should add their own)
+public/models/*.glb
+public/models/*.usdz

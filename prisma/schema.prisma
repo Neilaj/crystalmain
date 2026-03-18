@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Users ───────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  avatar       String?
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  site  Site?
+  pages Page[]
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+// ─── Site ────────────────────────────────────────────
+
+model Site {
+  id          String  @id @default(cuid())
+  name        String  @default("My Site")
+  tagline     String?
+  description String?
+  domain      String? @unique
+  logo        String?
+  favicon     String?
+  theme       String  @default("clean-blog")
+
+  // Social links
+  socialTwitter  String?
+  socialLinkedin String?
+  socialGithub   String?
+  socialYoutube  String?
+
+  // Footer
+  footerText String?
+
+  // Analytics
+  analyticsSnippet String?
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pages      Page[]
+  hubs       Hub[]
+  media      Media[]
+  navigation Navigation[]
+}
+
+// ─── Hubs (Topic Clusters for SEO/AEO) ──────────────
+
+model Hub {
+  id          String @id @default(cuid())
+  name        String                          // e.g., "Web Design"
+  slug        String                          // e.g., "web-design"
+  description String?                         // Hub topic description
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+
+  // The pillar page for this hub (optional — can be auto-generated)
+  pillarPageId String? @unique
+  pillarPage   Page?   @relation("HubPillar", fields: [pillarPageId], references: [id])
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Spoke pages linked to this hub
+  spokes Page[] @relation("HubSpokes")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+// ─── Pages ───────────────────────────────────────────
+
+model Page {
+  id     String @id @default(cuid())
+  title  String
+  slug   String
+  status PageStatus @default(DRAFT)
+
+  // Content stored as Tiptap JSON
+  content Json?
+
+  // Content type drives Schema.org structured data
+  contentType ContentType @default(PAGE)
+
+  // Optional collection for grouping (e.g., "Blog", "Services")
+  collection String?
+
+  // Hub relationships (topic clusters)
+  hubId String?
+  hub   Hub?    @relation("HubSpokes", fields: [hubId], references: [id], onDelete: SetNull)
+  pillarForHub Hub? @relation("HubPillar")
+
+  // SEO & AI fields
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  excerpt         String?
+
+  // Publishing
+  publishedAt DateTime?
+  sortOrder   Int       @default(0)
+
+  // Relationships
+  siteId   String
+  site     Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([siteId, slug])
+  @@index([siteId, status])
+  @@index([siteId, collection])
+  @@index([hubId])
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ContentType {
+  PAGE
+  ARTICLE
+  FAQ
+  LANDING
+  SERVICE
+  PRODUCT
+  PORTFOLIO
+  CONTACT
+}
+
+// ─── Media ───────────────────────────────────────────
+
+model Media {
+  id       String @id @default(cuid())
+  url      String
+  filename String
+  alt      String @default("")
+  caption  String?
+  mimeType String
+  size     Int    // bytes
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([siteId])
+}
+
+// ─── Navigation ──────────────────────────────────────
+
+model Navigation {
+  id       String @id @default(cuid())
+  label    String
+  url      String
+  order    Int    @default(0)
+  openNew  Boolean @default(false)
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+}
