@@ -122,9 +122,32 @@ export default function AIAssistant({
     setActiveAction(null);
   };
 
+  // Convert markdown-style text to HTML for the editor
+  const markdownToHtml = (text: string): string => {
+    return text
+      .split("\n")
+      .map((line) => {
+        const trimmed = line.trim();
+        if (!trimmed) return "";
+        if (trimmed.startsWith("### ")) return `<h3>${trimmed.slice(4)}</h3>`;
+        if (trimmed.startsWith("## ")) return `<h2>${trimmed.slice(3)}</h2>`;
+        if (trimmed.startsWith("# ")) return `<h2>${trimmed.slice(2)}</h2>`; // Treat # as h2 since page title is h1
+        if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) return `<li>${trimmed.slice(2)}</li>`;
+        if (/^\d+\.\s/.test(trimmed)) return `<li>${trimmed.replace(/^\d+\.\s/, "")}</li>`;
+        // Bold: **text** or __text__
+        const withBold = trimmed.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/__(.*?)__/g, "<strong>$1</strong>");
+        // Italic: *text* or _text_
+        const withItalic = withBold.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, "<em>$1</em>");
+        return `<p>${withItalic}</p>`;
+      })
+      .join("")
+      // Wrap consecutive <li> items in <ul>
+      .replace(/(<li>.*?<\/li>)+/g, (match) => `<ul>${match}</ul>`);
+  };
+
   const handleInsert = () => {
     if (output) {
-      onInsert(output);
+      onInsert(markdownToHtml(output));
       setOutput("");
       setPrompt("");
     }
@@ -235,7 +258,7 @@ export default function AIAssistant({
             ) : (
               <div
                 className="prose prose-sm max-w-none rounded-xl bg-gray-50 p-4 prose-headings:text-gray-900 prose-p:text-gray-600"
-                dangerouslySetInnerHTML={{ __html: output }}
+                dangerouslySetInnerHTML={{ __html: markdownToHtml(output) }}
               />
             )}
 
