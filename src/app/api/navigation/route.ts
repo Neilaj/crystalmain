@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { label, url, openNew } = body;
+  const { label, url, openNew, location } = body;
 
   if (!label?.trim() || !url?.trim()) {
     return NextResponse.json({ error: "Label and URL are required" }, { status: 400 });
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
       label,
       url,
       openNew: openNew || false,
+      location: location || "HEADER",
       order: (maxOrder?.order ?? -1) + 1,
       siteId: site.id,
     },

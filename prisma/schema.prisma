@@ -57,10 +57,15 @@ model Site {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  pages      Page[]
-  hubs       Hub[]
-  media      Media[]
-  navigation Navigation[]
+  // Enabled modules/features
+  enabledFeatures String[] @default(["contact-form"])
+
+  pages          Page[]
+  hubs           Hub[]
+  media          Media[]
+  navigation     Navigation[]
+  importHistory  ImportHistory[]
+  contactForms   ContactForm[]
 }
 
 // ─── Hubs (Topic Clusters for SEO/AEO) ──────────────
@@ -119,6 +124,10 @@ model Page {
   ogImage         String?
   excerpt         String?
 
+  // Import tracking
+  importBatchId String?
+  importBatch   ImportHistory? @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+
   // Publishing
   publishedAt DateTime?
   sortOrder   Int       @default(0)
@@ -136,6 +145,7 @@ model Page {
   @@index([siteId, status])
   @@index([siteId, collection])
   @@index([hubId])
+  @@index([importBatchId])
 }
 
 enum PageStatus {
@@ -174,6 +184,107 @@ model Media {
   @@index([siteId])
 }
 
+// ─── Import History ─────────────────────────────────
+
+model ImportHistory {
+  id          String       @id @default(cuid())
+  source      String                               // e.g., "wordpress"
+  sourceUrl   String                               // e.g., "https://oldsite.com"
+  sourceName  String?                              // e.g., "My Old Blog"
+  status      ImportStatus @default(COMPLETED)
+  stagingMode Boolean      @default(false)         // true = imported as drafts
+
+  // Stats
+  totalItems     Int    @default(0)
+  importedCount  Int    @default(0)
+  skippedCount   Int    @default(0)
+  mediaCount     Int    @default(0)
+
+  // Detailed report stored as JSON
+  report Json?
+
+  // Hub IDs created during this import (for rollback)
+  hubIds String[] @default([])
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Pages created during this import
+  pages Page[]
+
+  createdAt DateTime @default(now())
+
+  @@index([siteId])
+}
+
+enum ImportStatus {
+  COMPLETED
+  ROLLED_BACK
+  PARTIAL
+}
+
+// ─── Contact Forms (Built-in Module) ─────────────────
+
+model ContactForm {
+  id          String @id @default(cuid())
+  name        String                          // e.g., "Main Contact Form"
+  slug        String                          // e.g., "contact" — used in URL /form/contact
+  description String?
+
+  // Form configuration
+  fields      Json                            // Array of field definitions
+  submitLabel String  @default("Send Message")
+  successMessage String @default("Thank you! We'll get back to you soon.")
+
+  // Email notification
+  notifyEmail String?                         // Send notification to this email on submission
+
+  // Anti-spam
+  honeypotEnabled Boolean @default(true)
+
+  // Schema.org
+  schemaType  String  @default("ContactPage") // ContactPage, AskAction, etc.
+
+  enabled Boolean @default(true)
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  submissions FormSubmission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+model FormSubmission {
+  id     String @id @default(cuid())
+  data   Json                                 // Submitted form data as key-value pairs
+  status SubmissionStatus @default(NEW)
+
+  // Metadata
+  ipAddress  String?
+  userAgent  String?
+  referrer   String?
+
+  formId String
+  form   ContactForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([formId])
+  @@index([formId, status])
+}
+
+enum SubmissionStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+
 // ─── Navigation ──────────────────────────────────────
 
 model Navigation {
@@ -182,9 +293,17 @@ model Navigation {
   url      String
   order    Int    @default(0)
   openNew  Boolean @default(false)
+  location NavLocation @default(HEADER)
 
   siteId String
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@index([siteId])
+  @@index([siteId, location])
+}
+
+enum NavLocation {
+  HEADER
+  FOOTER
+  BOTH
 }

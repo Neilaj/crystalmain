@@ -8,6 +8,7 @@ interface NavItem {
   url: string;
   order: number;
   openNew: boolean;
+  location: "HEADER" | "FOOTER" | "BOTH";
 }
 
 export default function NavigationAdmin() {
@@ -16,6 +17,7 @@ export default function NavigationAdmin() {
   const [saving, setSaving] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newUrl, setNewUrl] = useState("");
+  const [newLocation, setNewLocation] = useState<"HEADER" | "FOOTER" | "BOTH">("HEADER");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editUrl, setEditUrl] = useState("");
@@ -37,7 +39,7 @@ export default function NavigationAdmin() {
     await fetch("/api/navigation", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ label: newLabel, url: newUrl }),
+      body: JSON.stringify({ label: newLabel, url: newUrl, location: newLocation }),
     });
     setNewLabel("");
     setNewUrl("");
@@ -167,9 +169,16 @@ export default function NavigationAdmin() {
                   </div>
                 ) : (
                   <>
-                    <div className="flex-1">
+                    <div className="flex-1 flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-900">{item.label}</span>
-                      <span className="ml-3 text-xs text-gray-400">{item.url}</span>
+                      <span className="text-xs text-gray-400">{item.url}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                        item.location === "HEADER" ? "bg-blue-50 text-blue-600" :
+                        item.location === "FOOTER" ? "bg-purple-50 text-purple-600" :
+                        "bg-green-50 text-green-600"
+                      }`}>
+                        {item.location === "BOTH" ? "Header + Footer" : item.location === "HEADER" ? "Header" : "Footer"}
+                      </span>
                     </div>
                     <button
                       onClick={() => startEdit(item)}
@@ -214,6 +223,18 @@ export default function NavigationAdmin() {
               placeholder="e.g. /about"
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-500">Location</label>
+            <select
+              value={newLocation}
+              onChange={(e) => setNewLocation(e.target.value as "HEADER" | "FOOTER" | "BOTH")}
+              className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            >
+              <option value="HEADER">Header</option>
+              <option value="FOOTER">Footer</option>
+              <option value="BOTH">Both</option>
+            </select>
           </div>
           <button
             onClick={handleAdd}

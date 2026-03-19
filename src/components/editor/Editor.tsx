@@ -6,6 +6,8 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CodeBlock from "@tiptap/extension-code-block";
+import { ContactFormBlock } from "./FormBlockExtension";
+import { ColumnLayout, Column } from "./ColumnExtension";
 import { EditorToolbar } from "./EditorToolbar";
 
 interface EditorProps {
@@ -42,6 +44,9 @@ export default function Editor({ content, onChange, onEditorReady }: EditorProps
       Placeholder.configure({
         placeholder: "Start writing your content...",
       }),
+      ContactFormBlock,
+      ColumnLayout,
+      Column,
     ],
     immediatelyRender: false,
     content: content || undefined,
@@ -64,7 +69,7 @@ export default function Editor({ content, onChange, onEditorReady }: EditorProps
   if (!editor) return null;
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white">
       <EditorToolbar editor={editor} />
       <EditorContent editor={editor} />
     </div>

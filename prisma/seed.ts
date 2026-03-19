@@ -106,9 +106,17 @@ async function main() {
     },
   });
 
+  // Delete existing nav items (in case of re-seed)
+  await prisma.navigation.deleteMany({ where: { siteId: site.id } });
+
   const navItems = [
-    { label: "Home", url: "/", order: 0 },
-    { label: "About", url: "/about", order: 1 },
+    { label: "Services", url: "#services", order: 0, location: "HEADER" as const },
+    { label: "Work", url: "#work", order: 1, location: "HEADER" as const },
+    { label: "Process", url: "#process", order: 2, location: "HEADER" as const },
+    { label: "About", url: "/about", order: 3, location: "BOTH" as const },
+    { label: "Contact", url: "#contact", order: 4, location: "BOTH" as const },
+    { label: "Privacy Policy", url: "/privacy", order: 5, location: "FOOTER" as const },
+    { label: "Terms of Service", url: "/terms", order: 6, location: "FOOTER" as const },
   ];
 
   for (const nav of navItems) {
@@ -117,8 +125,27 @@ async function main() {
     });
   }
 
+  // Create default contact form
+  await prisma.contactForm.upsert({
+    where: { siteId_slug: { siteId: site.id, slug: "contact" } },
+    update: {},
+    create: {
+      name: "Contact Form",
+      slug: "contact",
+      description: "Get in touch with us",
+      fields: [
+        { name: "name", label: "Your Name", type: "text", placeholder: "John Smith", required: true, width: "half" },
+        { name: "email", label: "Email Address", type: "email", placeholder: "john@example.com", required: true, width: "half" },
+        { name: "message", label: "Message", type: "textarea", placeholder: "Tell us about your project...", required: true, width: "full" },
+      ],
+      submitLabel: "Send Message",
+      successMessage: "Thank you! We'll get back to you within 24 hours.",
+      siteId: site.id,
+    },
+  });
+
   console.log("✅ Seeded: admin@parsley.dev / password123");
-  console.log("✅ Site created with homepage and about page");
+  console.log("✅ Site created with homepage, about page, and contact form");
 }
 
 main()

@@ -4,6 +4,8 @@ import { renderContent } from "@/lib/render-content";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import PageContent from "@/components/public/PageContent";
+import SiteFooter from "@/components/public/SiteFooter";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -78,31 +80,47 @@ export default async function DynamicPage({ params }: PageProps) {
   const isArticle = page.contentType === "ARTICLE";
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      {/* Minimal header for inner pages */}
-      <header className="border-b border-gray-100">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
+    <div className="flex min-h-screen flex-col bg-white text-gray-900">
+      {/* Dark header matching homepage */}
+      <header className="border-b border-red-900/20 bg-[#1a0a0a]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-red-700 to-red-900">
-              <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-700 to-red-900">
+              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
               </svg>
             </div>
-            <span className="text-lg font-bold text-gray-900 hover:text-gray-600 transition-colors">Crystal Studios</span>
+            <span className="text-lg font-bold text-white">Crystal Studios</span>
           </Link>
           <nav aria-label="Main navigation">
-            <ul className="flex items-center gap-6">
-              {site?.navigation.map((item) => (
-                <li key={item.id}>
-                  <Link
-                    href={item.url}
-                    className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-                    {...(item.openNew ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+            <ul className="flex items-center gap-8">
+              {site?.navigation
+                .filter((item) => item.location === "HEADER" || item.location === "BOTH")
+                .map((item) => {
+                  // Hash links should point back to homepage
+                  const href = item.url.startsWith("#") ? `/${item.url}` : item.url;
+                  const isCta = item.label.toLowerCase().includes("contact") || item.url === "#contact";
+                  if (isCta) return null; // Skip contact — it's the CTA button below
+                  return (
+                    <li key={item.id}>
+                      <Link
+                        href={href}
+                        className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                        {...(item.openNew ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              <li>
+                <Link
+                  href="/#contact"
+                  className="rounded-full bg-red-700 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-red-600"
+                >
+                  Get in touch
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
@@ -168,7 +186,7 @@ export default async function DynamicPage({ params }: PageProps) {
         }}
       />
 
-      <main className="mx-auto max-w-4xl px-6 py-12">
+      <main className="mx-auto max-w-6xl px-6 py-12">
         {/* Hub Breadcrumb */}
         {page.hub && (
           <nav className="mb-6" aria-label="Breadcrumb">
@@ -206,10 +224,9 @@ export default async function DynamicPage({ params }: PageProps) {
             )}
           </header>
 
-          <section
-            className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-red-600"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+          <section>
+            <PageContent html={html} />
+          </section>
         </article>
 
         {/* Related pages from same hub */}
@@ -246,13 +263,12 @@ export default async function DynamicPage({ params }: PageProps) {
         )}
       </main>
 
-      <footer className="border-t border-gray-100 bg-gray-50 py-8">
-        <div className="mx-auto max-w-4xl px-6">
-          <p className="text-center text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} Crystal Studios. Powered by <a href="https://parsley.dev" className="text-red-600 hover:text-red-700">Parsley</a>.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter
+        socialTwitter={site?.socialTwitter}
+        socialLinkedin={site?.socialLinkedin}
+        socialGithub={site?.socialGithub}
+        socialYoutube={site?.socialYoutube}
+      />
     </div>
   );
 }

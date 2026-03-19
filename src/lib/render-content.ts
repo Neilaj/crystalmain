@@ -72,6 +72,15 @@ function renderNode(node: TiptapNode): string {
       return `<hr />`;
     case "image":
       return `<img src="${escapeHtml(String(node.attrs?.src || ""))}" alt="${escapeHtml(String(node.attrs?.alt || ""))}" loading="lazy" />`;
+    case "columnLayout": {
+      const cols = node.attrs?.columns || 2;
+      const layout = node.attrs?.layout || "equal";
+      return `<div data-type="column-layout" data-columns="${cols}" data-layout="${layout}">${children}</div>`;
+    }
+    case "column":
+      return `<div data-type="column">${children}</div>`;
+    case "contactForm":
+      return `<div data-contact-form="${escapeHtml(String(node.attrs?.formSlug || ""))}" class="parsley-form-embed"></div>`;
     case "hardBreak":
       return `<br />`;
     default:

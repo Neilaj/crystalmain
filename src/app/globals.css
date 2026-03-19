@@ -205,6 +205,55 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Column Layout in Editor */
+.ProseMirror div[data-type="column-layout"] {
+  display: grid !important;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.ProseMirror div[data-type="column-layout"][data-columns="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+.ProseMirror div[data-type="column-layout"][data-columns="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+.ProseMirror div[data-type="column-layout"][data-columns="4"] {
+  grid-template-columns: repeat(4, 1fr);
+}
+.ProseMirror div[data-type="column-layout"][data-layout="70-30"] {
+  grid-template-columns: 2fr 1fr;
+}
+.ProseMirror div[data-type="column-layout"][data-layout="30-70"] {
+  grid-template-columns: 1fr 2fr;
+}
+
+/* Column Layout on Public Pages */
+.page-content div[data-type="column-layout"] {
+  display: grid !important;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+.page-content div[data-type="column-layout"][data-columns="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+.page-content div[data-type="column-layout"][data-columns="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+.page-content div[data-type="column-layout"][data-columns="4"] {
+  grid-template-columns: repeat(4, 1fr);
+}
+.page-content div[data-type="column-layout"][data-layout="70-30"] {
+  grid-template-columns: 2fr 1fr;
+}
+.page-content div[data-type="column-layout"][data-layout="30-70"] {
+  grid-template-columns: 1fr 2fr;
+}
+@media (max-width: 768px) {
+  .page-content div[data-type="column-layout"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Crystal homepage overrides — no max-width constraint */
 .crystal-homepage {
   width: 100vw;

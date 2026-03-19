@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import CrystalHomepage from "@/components/public/CrystalHomepage";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Crystal Studios — We Build Digital Experiences That Move People",
@@ -96,11 +97,26 @@ function HomepageJsonLd() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch navigation from database
+  const site = await prisma.site.findFirst();
+  let headerNav: { id: string; label: string; url: string; openNew: boolean }[] = [];
+  let footerNav: { id: string; label: string; url: string; openNew: boolean }[] = [];
+
+  if (site) {
+    const allNav = await prisma.navigation.findMany({
+      where: { siteId: site.id },
+      orderBy: { order: "asc" },
+      select: { id: true, label: true, url: true, openNew: true, location: true },
+    });
+    headerNav = allNav.filter((n) => n.location === "HEADER" || n.location === "BOTH");
+    footerNav = allNav.filter((n) => n.location === "FOOTER" || n.location === "BOTH");
+  }
+
   return (
     <>
       <HomepageJsonLd />
-      <CrystalHomepage />
+      <CrystalHomepage headerNav={headerNav} footerNav={footerNav} />
     </>
   );
 }

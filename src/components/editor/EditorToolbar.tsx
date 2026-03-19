@@ -1,7 +1,8 @@
 "use client";
 
 import { Editor } from "@tiptap/react";
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
+import { insertColumnLayout } from "./ColumnExtension";
 
 interface ToolbarProps {
   editor: Editor;
@@ -39,6 +40,24 @@ function Divider() {
 }
 
 export function EditorToolbar({ editor }: ToolbarProps) {
+  const [forms, setForms] = useState<Array<{ id: string; name: string; slug: string }>>([]);
+  const [showFormPicker, setShowFormPicker] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/forms")
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setForms(data); })
+      .catch(() => {});
+  }, []);
+
+  const insertForm = useCallback((slug: string, name: string) => {
+    editor.chain().focus().insertContent({
+      type: "contactForm",
+      attrs: { formSlug: slug, formName: name },
+    }).run();
+    setShowFormPicker(false);
+  }, [editor]);
+
   const addImage = useCallback(() => {
     const url = window.prompt("Enter image URL:");
     if (url) {
@@ -190,6 +209,135 @@ export function EditorToolbar({ editor }: ToolbarProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
         </svg>
       </ToolbarButton>
+
+      <Divider />
+
+      {/* Column Layouts */}
+      <div className="relative group">
+        <button
+          type="button"
+          onClick={() => {
+            const el = document.getElementById("layout-picker");
+            if (el) el.classList.toggle("hidden");
+          }}
+          title="Insert Column Layout"
+          className="flex items-center gap-1.5 rounded px-2 py-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
+          </svg>
+          <span className="text-xs font-medium">Layout</span>
+        </button>
+        {/* Tooltip */}
+        <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
+          Insert column layout (2, 3, or 4 columns)
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+        </div>
+        <div id="layout-picker" className="hidden absolute bottom-full left-0 z-50 mb-2 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+          <div className="p-2">
+            <p className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase">Column Layout</p>
+            <button
+              onClick={() => { insertColumnLayout(editor, 2, "equal"); document.getElementById("layout-picker")?.classList.add("hidden"); }}
+              className="w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2"
+            >
+              <div className="flex gap-0.5">
+                <div className="h-4 w-6 rounded-sm bg-gray-300" />
+                <div className="h-4 w-6 rounded-sm bg-gray-300" />
+              </div>
+              2 Columns (50/50)
+            </button>
+            <button
+              onClick={() => { insertColumnLayout(editor, 2, "70-30"); document.getElementById("layout-picker")?.classList.add("hidden"); }}
+              className="w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2"
+            >
+              <div className="flex gap-0.5">
+                <div className="h-4 w-8 rounded-sm bg-gray-300" />
+                <div className="h-4 w-4 rounded-sm bg-gray-300" />
+              </div>
+              2 Columns (70/30)
+            </button>
+            <button
+              onClick={() => { insertColumnLayout(editor, 2, "30-70"); document.getElementById("layout-picker")?.classList.add("hidden"); }}
+              className="w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2"
+            >
+              <div className="flex gap-0.5">
+                <div className="h-4 w-4 rounded-sm bg-gray-300" />
+                <div className="h-4 w-8 rounded-sm bg-gray-300" />
+              </div>
+              2 Columns (30/70)
+            </button>
+            <button
+              onClick={() => { insertColumnLayout(editor, 3, "equal"); document.getElementById("layout-picker")?.classList.add("hidden"); }}
+              className="w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2"
+            >
+              <div className="flex gap-0.5">
+                <div className="h-4 w-4 rounded-sm bg-gray-300" />
+                <div className="h-4 w-4 rounded-sm bg-gray-300" />
+                <div className="h-4 w-4 rounded-sm bg-gray-300" />
+              </div>
+              3 Columns
+            </button>
+            <button
+              onClick={() => { insertColumnLayout(editor, 4, "equal"); document.getElementById("layout-picker")?.classList.add("hidden"); }}
+              className="w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center gap-2"
+            >
+              <div className="flex gap-0.5">
+                <div className="h-4 w-3 rounded-sm bg-gray-300" />
+                <div className="h-4 w-3 rounded-sm bg-gray-300" />
+                <div className="h-4 w-3 rounded-sm bg-gray-300" />
+                <div className="h-4 w-3 rounded-sm bg-gray-300" />
+              </div>
+              4 Columns
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+
+      {/* Form Block */}
+      <div className="relative group">
+        <button
+          type="button"
+          onClick={() => setShowFormPicker(!showFormPicker)}
+          title="Insert Contact Form"
+          className="flex items-center gap-1.5 rounded px-2 py-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+          </svg>
+          <span className="text-xs font-medium">Form</span>
+        </button>
+        {/* Tooltip */}
+        <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
+          Insert a contact form into the page
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+        </div>
+        {showFormPicker && (
+          <div className="absolute bottom-full left-0 z-50 mb-2 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+            <div className="p-2">
+              <p className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase">Insert Form</p>
+              {forms.length === 0 ? (
+                <p className="px-2 py-2 text-xs text-gray-400">
+                  No forms yet.{" "}
+                  <a href="/admin/forms/new" className="text-green-600 underline">Create one</a>
+                </p>
+              ) : (
+                forms.map((form) => (
+                  <button
+                    key={form.id}
+                    onClick={() => insertForm(form.slug, form.name)}
+                    className="w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700"
+                  >
+                    {form.name}
+                    <span className="ml-1 text-xs text-gray-400">/form/{form.slug}</span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       <Divider />
 
