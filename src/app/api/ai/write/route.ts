@@ -6,28 +6,21 @@ import Anthropic from "@anthropic-ai/sdk";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const SYSTEM_PROMPT = `You are an expert content writer and SEO/AEO specialist working inside the Parsley CMS editor. Your job is to help users create high-quality, well-structured content that is optimized for both human readers and AI search engines.
+const SYSTEM_PROMPT = `You are an expert content writer working inside the Parsley CMS block editor. Your job is to write content that website visitors will read.
 
-Guidelines:
-- Write in clean, semantic HTML that can be inserted into a rich text editor
-- Use proper heading hierarchy (h2, h3 — never h1, the page title handles that)
-- Write engaging, informative content that demonstrates topical authority
-- Include natural keyword usage without keyword stuffing
-- Structure content with clear sections, bullet points, and short paragraphs
-- When writing articles, include an introduction, clear sections, and a conclusion
-- When generating FAQ content, use question-and-answer format
-- When improving text, maintain the author's voice while enhancing clarity
-- Keep paragraphs short (2-3 sentences) for readability
-- Use active voice when possible
+CRITICAL RULES:
+- Output ONLY the content text itself. No HTML tags, no code blocks, no backticks.
+- Never output meta titles, meta descriptions, or SEO suggestions unless the user specifically uses the "seo" action.
+- Never include instructions like "Content Improvements Made" or "Internal Linking Opportunities" in your output.
+- Write naturally as if you're speaking to the reader — not to the website admin.
+- Use proper heading hierarchy: ## for main sections, ### for subsections (these become H2, H3 in the editor).
+- Keep paragraphs short (2-3 sentences) for readability.
+- Use bullet points where appropriate.
+- Write in active voice.
+- Be engaging and authoritative without being salesy.
+- When improving existing text, maintain the author's voice.
 
-For SEO/AEO optimization suggestions:
-- Suggest meta titles (under 60 characters)
-- Suggest meta descriptions (under 160 characters)
-- Suggest internal linking opportunities
-- Recommend content structure improvements
-- Identify missing subtopics that would strengthen the hub
-
-Format your output as clean HTML unless specifically asked for plain text.`;
+Your output goes directly into a page that customers see. Write accordingly.`;
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -55,58 +48,72 @@ export async function POST(req: NextRequest) {
 
   switch (action) {
     case "write":
-      userMessage = `Write content about: ${prompt}${pageTitle ? `\n\nThis is for a page titled "${pageTitle}".` : ""}${hubName ? `\nThis page belongs to the "${hubName}" content hub.` : ""}${contentType ? `\nContent type: ${contentType}` : ""}`;
+      userMessage = `Write website page content about: ${prompt}${pageTitle ? `\nPage title: "${pageTitle}"` : ""}${contentType ? `\nContent type: ${contentType}` : ""}
+
+Remember: Write ONLY the content that visitors will read. No HTML tags, no SEO suggestions, no meta descriptions. Just clean, well-structured text with ## headings and bullet points where appropriate.`;
       break;
 
     case "improve":
-      userMessage = `Improve the following content. Make it clearer, more engaging, and better optimized for AI search engines. Maintain the author's voice.\n\nCurrent content:\n${content}`;
+      userMessage = `Rewrite and improve the following content. Make it clearer, more engaging, and more professional. Keep the same meaning and voice. Output ONLY the improved text — no explanations, no suggestions, no HTML tags.
+
+Current content:
+${content}`;
       break;
 
     case "expand":
-      userMessage = `Expand on the following content. Add more detail, examples, and depth while maintaining the same tone and style.\n\nCurrent content:\n${content}`;
+      userMessage = `Expand on the following content. Add more detail, examples, and depth. Output ONLY the expanded text — no explanations or suggestions.
+
+Current content:
+${content}`;
       break;
 
     case "shorten":
-      userMessage = `Shorten the following content. Make it more concise while keeping the key points.\n\nCurrent content:\n${content}`;
+      userMessage = `Shorten the following content. Make it more concise while keeping the key points. Output ONLY the shortened text.
+
+Current content:
+${content}`;
       break;
 
     case "seo":
-      userMessage = `Analyze the following content and provide SEO/AEO optimization suggestions. Include:
-1. Suggested meta title (under 60 chars)
-2. Suggested meta description (under 160 chars)
-3. Content structure improvements
-4. Missing subtopics or sections
-5. Internal linking suggestions
-${hubName ? `6. How this content can better support the "${hubName}" hub` : ""}
+      userMessage = `Analyze the following page content and provide SEO/AEO optimization suggestions as a numbered list:
 
-Format your response as a clear, numbered list (plain text, not HTML).
+1. Suggested meta title (under 60 chars) — ready to paste into the Meta Title field
+2. Suggested meta description (under 160 chars) — ready to paste into the Meta Description field
+3. Content structure improvements (if any)
+4. Missing topics that would strengthen authority
+5. Suggested excerpt (1-2 sentences summarizing the page)
+${hubName ? `6. How to better connect this to the "${hubName}" hub` : ""}
 
-Content to analyze:
-Title: ${pageTitle || "Untitled"}
-Type: ${contentType || "PAGE"}
+Page title: ${pageTitle || "Untitled"}
+Content type: ${contentType || "PAGE"}
+Content:
 ${content || "(No content yet)"}`;
       break;
 
     case "outline":
-      userMessage = `Create a detailed content outline for: ${prompt}${pageTitle ? `\n\nPage title: "${pageTitle}"` : ""}${hubName ? `\nThis belongs to the "${hubName}" content hub.` : ""}${contentType ? `\nContent type: ${contentType}` : ""}
+      userMessage = `Create a content outline for: ${prompt}${pageTitle ? `\nPage title: "${pageTitle}"` : ""}${contentType ? `\nContent type: ${contentType}` : ""}
 
-Provide the outline as HTML with h2 and h3 headings, and brief bullet points under each section describing what to cover.`;
+Write the outline using ## for main sections and ### for subsections, with brief notes under each. Output ONLY the outline — no HTML, no explanations.`;
       break;
 
     case "faq":
-      userMessage = `Generate 5-8 frequently asked questions and detailed answers about: ${prompt || pageTitle || "this topic"}${hubName ? `\nContext: This is part of the "${hubName}" content hub.` : ""}
+      userMessage = `Write 5-8 frequently asked questions and detailed answers about: ${prompt || pageTitle || "this topic"}
 
-Format as HTML using h3 for questions and p tags for answers.`;
+Format each as:
+### [Question]?
+[Answer paragraph]
+
+Output ONLY the FAQ content — no introductions, no HTML tags, no suggestions.`;
       break;
 
     case "hub-suggestions":
-      userMessage = `I have a content hub called "${hubName}". Suggest 5-8 spoke article ideas that would strengthen this hub's topical authority. For each suggestion, provide:
+      userMessage = `I have a content hub called "${hubName}". Suggest 5-8 article ideas that would strengthen this topic cluster. For each:
 1. Article title
-2. Suggested slug
-3. Brief description (2-3 sentences)
-4. Content type recommendation (Article, FAQ, Service, etc.)
+2. URL slug
+3. Brief description (1-2 sentences)
+4. Content type (Article, FAQ, Service, etc.)
 
-Format as a clean numbered list in plain text.`;
+Format as a clean numbered list.`;
       break;
 
     default:
