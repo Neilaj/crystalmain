@@ -135,14 +135,14 @@ export default function Sidebar() {
       {/* User & Sign out */}
       <div className="border-t border-gray-200 px-3 py-3">
         <div className="flex items-center justify-between rounded-lg px-3 py-2">
-          <div className="min-w-0">
+          <Link href="/admin/profile" className="min-w-0 hover:opacity-80">
             <p className="truncate text-sm font-medium text-gray-900">
               {session?.user?.name}
             </p>
             <p className="truncate text-xs text-gray-500">
               {session?.user?.email}
             </p>
-          </div>
+          </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="ml-2 rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
