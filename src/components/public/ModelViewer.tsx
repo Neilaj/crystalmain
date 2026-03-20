@@ -33,7 +33,7 @@ function Model({ url, onLoaded }: { url: string; onLoaded: () => void }) {
     const center = new THREE.Vector3();
     box.getCenter(center);
     const maxDim = Math.max(size.x, size.y, size.z);
-    const s = maxDim > 0 ? 1.5 / maxDim : 1;
+    const s = maxDim > 0 ? 1.2 / maxDim : 1;
     clone.scale.setScalar(s);
     clone.position.set(-center.x * s, -center.y * s, -center.z * s);
 

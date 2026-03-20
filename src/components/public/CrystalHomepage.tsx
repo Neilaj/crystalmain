@@ -504,7 +504,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
             <rect width="100%" height="100%" fill="url(#ar-grid)" />
           </svg>
         </div>
-        <div className="relative z-10 mx-auto max-w-6xl px-6 overflow-hidden">
+        <div className="relative z-10 mx-auto max-w-6xl px-6">
           <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-2">
             <div className="min-w-0">
               <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-400/30 bg-red-600/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-red-300">
