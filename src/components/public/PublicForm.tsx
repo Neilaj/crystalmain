@@ -26,6 +26,7 @@ export default function PublicForm({ formSlug, fields, submitLabel, successMessa
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [loadedAt] = useState(() => Date.now());
 
   function updateField(name: string, value: string) {
     setData((prev) => ({ ...prev, [name]: value }));
@@ -44,6 +45,7 @@ export default function PublicForm({ formSlug, fields, submitLabel, successMessa
           formSlug,
           data,
           _honeypot: honeypot,
+          _loadedAt: loadedAt,
         }),
       });
       const result = await res.json();
