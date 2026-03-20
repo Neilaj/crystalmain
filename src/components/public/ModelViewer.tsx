@@ -69,9 +69,11 @@ function LoadingSpinner() {
 export default function ModelViewer({
   modelUrl,
   className = "",
+  style,
 }: {
   modelUrl: string;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   const [loaded, setLoaded] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -116,6 +118,7 @@ export default function ModelViewer({
     <div
       ref={containerRef}
       className={`relative ${isFullscreen ? "bg-gray-900" : ""} ${className}`}
+      style={style}
     >
       {!loaded && <LoadingSpinner />}
       <Canvas

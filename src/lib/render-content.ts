@@ -81,6 +81,8 @@ function renderNode(node: TiptapNode): string {
       return `<div data-type="column">${children}</div>`;
     case "contactForm":
       return `<div data-contact-form="${escapeHtml(String(node.attrs?.formSlug || ""))}" class="parsley-form-embed"></div>`;
+    case "modelBlock":
+      return `<div data-model-viewer="true" data-model-url="${escapeHtml(String(node.attrs?.modelUrl || ""))}" data-model-name="${escapeHtml(String(node.attrs?.modelName || ""))}" data-model-height="${escapeHtml(String(node.attrs?.height || "400"))}" class="parsley-model-embed"></div>`;
     case "hardBreak":
       return `<br />`;
     default:

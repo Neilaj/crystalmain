@@ -7,6 +7,7 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CodeBlock from "@tiptap/extension-code-block";
 import { ContactFormBlock } from "./FormBlockExtension";
+import { ModelBlock } from "./ModelBlockExtension";
 import { ColumnLayout, Column } from "./ColumnExtension";
 import { EditorToolbar } from "./EditorToolbar";
 
@@ -45,6 +46,7 @@ export default function Editor({ content, onChange, onEditorReady }: EditorProps
         placeholder: "Start writing your content...",
       }),
       ContactFormBlock,
+      ModelBlock,
       ColumnLayout,
       Column,
     ],

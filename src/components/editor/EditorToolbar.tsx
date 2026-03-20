@@ -42,6 +42,9 @@ function Divider() {
 export function EditorToolbar({ editor }: ToolbarProps) {
   const [forms, setForms] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [showFormPicker, setShowFormPicker] = useState(false);
+  const [showModelPicker, setShowModelPicker] = useState(false);
+  const [models, setModels] = useState<Array<{ url: string; pathname: string; size: number }>>([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetch("/api/forms")
@@ -49,6 +52,42 @@ export function EditorToolbar({ editor }: ToolbarProps) {
       .then((data) => { if (Array.isArray(data)) setForms(data); })
       .catch(() => {});
   }, []);
+
+  const fetchModels = useCallback(() => {
+    fetch("/api/models/upload")
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setModels(data); })
+      .catch(() => {});
+  }, []);
+
+  const insertModel = useCallback((url: string, name: string) => {
+    editor.chain().focus().insertContent({
+      type: "modelBlock",
+      attrs: { modelUrl: url, modelName: name, height: 400 },
+    }).run();
+    setShowModelPicker(false);
+  }, [editor]);
+
+  const uploadModel = useCallback(async (file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/models/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        insertModel(data.url, data.name || file.name);
+        fetchModels();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Upload failed");
+      }
+    } catch {
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }, [insertModel, fetchModels]);
 
   const insertForm = useCallback((slug: string, name: string) => {
     editor.chain().focus().insertContent({
@@ -333,6 +372,93 @@ export function EditorToolbar({ editor }: ToolbarProps) {
                     <span className="ml-1 text-xs text-gray-400">/form/{form.slug}</span>
                   </button>
                 ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 3D Model Block */}
+      <div className="relative group">
+        <button
+          type="button"
+          onClick={() => {
+            if (!showModelPicker) fetchModels();
+            setShowModelPicker(!showModelPicker);
+          }}
+          title="Insert 3D Model"
+          className="flex items-center gap-1.5 rounded px-2 py-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+          </svg>
+          <span className="text-xs font-medium">3D</span>
+        </button>
+        <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
+          Insert a 3D model viewer
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+        </div>
+        {showModelPicker && (
+          <div className="absolute bottom-full left-0 z-50 mb-2 w-72 rounded-lg border border-gray-200 bg-white shadow-lg">
+            <div className="p-2">
+              <p className="px-2 py-1 text-xs font-semibold text-gray-400 uppercase">Insert 3D Model</p>
+
+              {/* Upload button */}
+              <label className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-blue-600 hover:bg-blue-50 ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                </svg>
+                {uploading ? "Uploading..." : "Upload GLB file"}
+                <input
+                  type="file"
+                  accept=".glb,.gltf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) uploadModel(file);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+
+              {/* Paste URL */}
+              <button
+                onClick={() => {
+                  const url = window.prompt("Enter GLB model URL:");
+                  if (url) {
+                    const name = url.split("/").pop()?.replace(".glb", "") || "3D Model";
+                    insertModel(url, name);
+                  }
+                }}
+                className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                </svg>
+                Paste URL
+              </button>
+
+              {/* Existing models */}
+              {models.length > 0 && (
+                <>
+                  <div className="my-1 border-t border-gray-100" />
+                  <p className="px-2 py-1 text-[10px] font-semibold text-gray-400 uppercase">Uploaded Models</p>
+                  {models.map((model) => (
+                    <button
+                      key={model.url}
+                      onClick={() => insertModel(model.url, model.pathname.replace("models/", ""))}
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                    >
+                      <svg className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                      </svg>
+                      <span className="truncate">{model.pathname.replace("models/", "")}</span>
+                      <span className="ml-auto flex-shrink-0 text-[10px] text-gray-400">
+                        {(model.size / (1024 * 1024)).toFixed(1)}MB
+                      </span>
+                    </button>
+                  ))}
+                </>
               )}
             </div>
           </div>
