@@ -99,8 +99,13 @@ export function EditorToolbar({ editor }: ToolbarProps) {
     setShowFormPicker(false);
   }, [editor]);
 
-  const addImage = useCallback((url: string, alt?: string) => {
-    editor.chain().focus().setImage({ src: url, alt: alt || "" }).run();
+  const addImage = useCallback((url: string, alt?: string, title?: string, caption?: string) => {
+    // Insert image with alt and title
+    editor.chain().focus().setImage({ src: url, alt: alt || "", title: title || "" }).run();
+    // If caption is provided, add it as a paragraph below
+    if (caption) {
+      editor.chain().focus().createParagraphNear().insertContent(`<em>${caption}</em>`).run();
+    }
     setShowImagePicker(false);
   }, [editor]);
 
