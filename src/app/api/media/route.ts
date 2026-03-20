@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 
 // GET /api/media — list all media
 export async function GET() {
@@ -26,7 +25,7 @@ export async function GET() {
   return NextResponse.json(media);
 }
 
-// POST /api/media — upload a file
+// POST /api/media — upload a file to Vercel Blob
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -47,42 +46,52 @@ export async function POST(req: NextRequest) {
   }
 
   // Validate file type
-  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/svg+xml",
+  ];
   if (!allowedTypes.includes(file.type)) {
-    return NextResponse.json({ error: "File type not allowed. Use JPEG, PNG, GIF, WebP, or SVG." }, { status: 400 });
+    return NextResponse.json(
+      { error: "File type not allowed. Use JPEG, PNG, GIF, WebP, or SVG." },
+      { status: 400 }
+    );
   }
 
   // Max 10MB
   if (file.size > 10 * 1024 * 1024) {
-    return NextResponse.json({ error: "File too large. Maximum 10MB." }, { status: 400 });
+    return NextResponse.json(
+      { error: "File too large. Maximum 10MB." },
+      { status: 400 }
+    );
   }
 
-  // Generate unique filename
-  const ext = path.extname(file.name) || ".jpg";
-  const basename = path.basename(file.name, ext).replace(/[^a-zA-Z0-9-_]/g, "-");
-  const uniqueName = `${basename}-${Date.now()}${ext}`;
+  try {
+    // Upload to Vercel Blob
+    const blob = await put(`media/${Date.now()}-${file.name}`, file, {
+      access: "public",
+    });
 
-  // Save to public/uploads/
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
+    // Save to database
+    const media = await prisma.media.create({
+      data: {
+        url: blob.url,
+        filename: file.name,
+        alt: "",
+        mimeType: file.type,
+        size: file.size,
+        siteId: site.id,
+      },
+    });
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  await writeFile(path.join(uploadDir, uniqueName), buffer);
-
-  const url = `/uploads/${uniqueName}`;
-
-  // Save to database
-  const media = await prisma.media.create({
-    data: {
-      url,
-      filename: file.name,
-      alt: "",
-      mimeType: file.type,
-      size: file.size,
-      siteId: site.id,
-    },
-  });
-
-  return NextResponse.json(media, { status: 201 });
+    return NextResponse.json(media, { status: 201 });
+  } catch (error) {
+    console.error("Media upload error:", error);
+    return NextResponse.json(
+      { error: "Upload failed" },
+      { status: 500 }
+    );
+  }
 }

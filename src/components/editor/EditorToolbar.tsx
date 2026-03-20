@@ -3,6 +3,7 @@
 import { Editor } from "@tiptap/react";
 import { useCallback, useState, useEffect } from "react";
 import { insertColumnLayout } from "./ColumnExtension";
+import { ImagePicker } from "./ImagePicker";
 
 interface ToolbarProps {
   editor: Editor;
@@ -45,6 +46,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [models, setModels] = useState<Array<{ url: string; pathname: string; size: number }>>([]);
   const [uploading, setUploading] = useState(false);
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   useEffect(() => {
     fetch("/api/forms")
@@ -97,11 +99,9 @@ export function EditorToolbar({ editor }: ToolbarProps) {
     setShowFormPicker(false);
   }, [editor]);
 
-  const addImage = useCallback(() => {
-    const url = window.prompt("Enter image URL:");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
+  const addImage = useCallback((url: string, alt?: string) => {
+    editor.chain().focus().setImage({ src: url, alt: alt || "" }).run();
+    setShowImagePicker(false);
   }, [editor]);
 
   const addLink = useCallback(() => {
@@ -234,7 +234,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5" />
         </svg>
       </ToolbarButton>
-      <ToolbarButton onClick={addImage} title="Insert Image">
+      <ToolbarButton onClick={() => setShowImagePicker(true)} title="Insert Image">
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
         </svg>
@@ -484,6 +484,13 @@ export function EditorToolbar({ editor }: ToolbarProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3" />
         </svg>
       </ToolbarButton>
+
+      {/* Image Picker Modal */}
+      <ImagePicker
+        open={showImagePicker}
+        onClose={() => setShowImagePicker(false)}
+        onSelect={addImage}
+      />
     </div>
   );
 }
