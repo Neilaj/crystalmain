@@ -540,7 +540,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
             <div className="relative">
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
                 <ModelViewer
-                  modelUrl="/models/Lac-Blk-Trainers.glb"
+                  modelUrl="https://tvcsf7shtoelkabr.public.blob.vercel-storage.com/models/Lac-Blk-Trainers.glb"
                   className="h-[400px] w-full sm:h-[450px]"
                 />
               </div>
