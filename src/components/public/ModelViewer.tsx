@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useState, useMemo } from "react";
+import { Suspense, useRef, useState, useMemo, useCallback } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
@@ -26,7 +26,7 @@ function Model({ url, onLoaded }: { url: string; onLoaded: () => void }) {
       }
     });
 
-    // Auto-fit: scale and center
+    // Auto-fit: scale and center (centered vertically at origin)
     const box = new THREE.Box3().setFromObject(clone);
     const size = new THREE.Vector3();
     box.getSize(size);
@@ -74,12 +74,52 @@ export default function ModelViewer({
   className?: string;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!containerRef.current) return;
+
+    if (!isFullscreen) {
+      if (containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen();
+      } else if ((containerRef.current as HTMLDivElement & { webkitRequestFullscreen?: () => void }).webkitRequestFullscreen) {
+        (containerRef.current as HTMLDivElement & { webkitRequestFullscreen: () => void }).webkitRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as Document & { webkitExitFullscreen?: () => void }).webkitExitFullscreen) {
+        (document as Document & { webkitExitFullscreen: () => void }).webkitExitFullscreen();
+      }
+      setIsFullscreen(false);
+    }
+  }, [isFullscreen]);
+
+  // Listen for fullscreen exit via Escape key
+  useState(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+    };
+  });
 
   return (
-    <div className={`relative ${className}`}>
+    <div
+      ref={containerRef}
+      className={`relative ${isFullscreen ? "bg-gray-900" : ""} ${className}`}
+    >
       {!loaded && <LoadingSpinner />}
       <Canvas
-        camera={{ position: [0, 0.3, 2.2], fov: 40 }}
+        camera={{ position: [0, 0, 2.5], fov: 40 }}
         style={{ background: "transparent" }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 2]}
@@ -93,7 +133,7 @@ export default function ModelViewer({
         </Suspense>
 
         <ContactShadows
-          position={[0, -0.5, 0]}
+          position={[0, -0.75, 0]}
           opacity={0.3}
           scale={3}
           blur={2}
@@ -108,10 +148,30 @@ export default function ModelViewer({
           minDistance={1}
           maxDistance={4}
           autoRotate={false}
-          target={[0, 0.15, 0]}
+          target={[0, 0, 0]}
         />
       </Canvas>
 
+      {/* Fullscreen button */}
+      {loaded && (
+        <button
+          onClick={toggleFullscreen}
+          className="absolute top-3 right-3 rounded-lg bg-black/40 p-2 text-white/70 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white"
+          title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+        >
+          {isFullscreen ? (
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+            </svg>
+          )}
+        </button>
+      )}
+
+      {/* Instructions badge */}
       {loaded && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 shadow-sm backdrop-blur-sm">
           <svg className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
