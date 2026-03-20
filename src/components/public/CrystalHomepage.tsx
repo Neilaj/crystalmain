@@ -538,13 +538,10 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
               </div>
             </div>
             <div className="relative">
-              <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-8">
-                <Image
-                  src="/images/custom-software-box.png"
-                  alt="3D Product — Built by Crystal Studios"
-                  width={500}
-                  height={400}
-                  className="mx-auto object-contain"
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
+                <ModelViewer
+                  modelUrl="/models/Lac-Blk-Trainers.glb"
+                  className="h-[400px] w-full sm:h-[450px]"
                 />
               </div>
               <div className="mt-4 flex items-center justify-center gap-6 text-sm text-gray-400">
