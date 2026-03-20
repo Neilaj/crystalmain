@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { compareSync, hashSync } from "bcryptjs";
+import { hashSync } from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -10,11 +10,11 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { currentPassword, newPassword } = await req.json();
+  const { newPassword } = await req.json();
 
-  if (!currentPassword || !newPassword) {
+  if (!newPassword) {
     return NextResponse.json(
-      { error: "Current password and new password are required" },
+      { error: "New password is required" },
       { status: 400 }
     );
   }
@@ -31,14 +31,6 @@ export async function PUT(req: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
-
-  const isValid = compareSync(currentPassword, user.passwordHash);
-  if (!isValid) {
-    return NextResponse.json(
-      { error: "Current password is incorrect" },
-      { status: 403 }
-    );
   }
 
   const newHash = hashSync(newPassword, 10);

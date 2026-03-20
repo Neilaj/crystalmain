@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -18,12 +17,12 @@ export default function ProfilePage() {
     setError("");
 
     if (newPassword !== confirmPassword) {
-      setError("New passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
     if (newPassword.length < 6) {
-      setError("New password must be at least 6 characters");
+      setError("Password must be at least 6 characters");
       return;
     }
 
@@ -32,7 +31,7 @@ export default function ProfilePage() {
       const res = await fetch("/api/auth/password", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ newPassword }),
       });
 
       const data = await res.json();
@@ -41,7 +40,6 @@ export default function ProfilePage() {
         setError(data.error || "Failed to update password");
       } else {
         setMessage("Password updated successfully!");
-        setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       }
@@ -90,23 +88,6 @@ export default function ProfilePage() {
         <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
           <div>
             <label
-              htmlFor="currentPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Current Password
-            </label>
-            <input
-              id="currentPassword"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </div>
-
-          <div>
-            <label
               htmlFor="newPassword"
               className="block text-sm font-medium text-gray-700"
             >
@@ -120,6 +101,7 @@ export default function ProfilePage() {
               required
               minLength={6}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              placeholder="Minimum 6 characters"
             />
           </div>
 
@@ -138,6 +120,7 @@ export default function ProfilePage() {
               required
               minLength={6}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              placeholder="Re-enter your new password"
             />
           </div>
 

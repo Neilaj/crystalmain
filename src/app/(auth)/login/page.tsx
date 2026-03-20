@@ -96,15 +96,7 @@ function LoginForm() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/signup"
-          className="font-medium text-green-600 hover:text-green-500"
-        >
-          Sign up
-        </Link>
-      </p>
+      {/* Sign up disabled for production sites */}
     </div>
   );
 }
