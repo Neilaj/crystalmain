@@ -70,8 +70,13 @@ function renderNode(node: TiptapNode): string {
       return `<pre><code>${children}</code></pre>`;
     case "horizontalRule":
       return `<hr />`;
-    case "image":
-      return `<img src="${escapeHtml(String(node.attrs?.src || ""))}" alt="${escapeHtml(String(node.attrs?.alt || ""))}" loading="lazy" />`;
+    case "image": {
+      const imgWidth = String(node.attrs?.width || "100");
+      const imgAlignment = String(node.attrs?.alignment || "center");
+      const imgTitle = node.attrs?.title ? ` title="${escapeHtml(String(node.attrs.title))}"` : "";
+      const alignStyle = imgAlignment === "left" ? "margin-right:auto" : imgAlignment === "right" ? "margin-left:auto" : "margin-left:auto;margin-right:auto";
+      return `<img src="${escapeHtml(String(node.attrs?.src || ""))}" alt="${escapeHtml(String(node.attrs?.alt || ""))}"${imgTitle} data-width="${imgWidth}" data-alignment="${imgAlignment}" style="width:${imgWidth}%;${alignStyle};display:block" class="rounded-lg h-auto" loading="lazy" />`;
+    }
     case "columnLayout": {
       const cols = node.attrs?.columns || 2;
       const layout = node.attrs?.layout || "equal";

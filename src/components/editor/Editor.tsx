@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
+import { ResizableImage } from "./ImageExtension";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CodeBlock from "@tiptap/extension-code-block";
@@ -31,11 +31,7 @@ export default function Editor({ content, onChange, onEditorReady }: EditorProps
           class: "bg-gray-900 text-gray-100 rounded-lg p-4 font-mono text-sm",
         },
       }),
-      Image.configure({
-        HTMLAttributes: {
-          class: "rounded-lg max-w-full h-auto",
-        },
-      }),
+      ResizableImage,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {

@@ -100,8 +100,11 @@ export function EditorToolbar({ editor }: ToolbarProps) {
   }, [editor]);
 
   const addImage = useCallback((url: string, alt?: string, title?: string, caption?: string) => {
-    // Insert image with alt and title
-    editor.chain().focus().setImage({ src: url, alt: alt || "", title: title || "" }).run();
+    // Insert resizable image node with default width/alignment
+    editor.chain().focus().insertContent({
+      type: "image",
+      attrs: { src: url, alt: alt || "", title: title || "", width: "100", alignment: "center" },
+    }).run();
     // If caption is provided, add it as a paragraph below
     if (caption) {
       editor.chain().focus().createParagraphNear().insertContent(`<em>${caption}</em>`).run();
