@@ -537,14 +537,14 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 ))}
               </div>
             </div>
-            <div className="relative">
+            <div className="relative mx-auto w-full max-w-md lg:max-w-none">
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
                 <ModelViewer
                   modelUrl="https://tvcsf7shtoelkabr.public.blob.vercel-storage.com/models/Lac-Blk-Trainers.glb"
-                  className="h-[400px] w-full sm:h-[450px]"
+                  className="h-[350px] w-full sm:h-[400px] lg:h-[450px]"
                 />
               </div>
-              <div className="mt-4 flex items-center justify-center gap-6 text-sm text-gray-400">
+              <div className="mt-4 flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-400">
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-red-500" />
                   Web 3D Viewer
