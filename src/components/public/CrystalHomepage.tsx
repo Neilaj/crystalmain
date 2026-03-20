@@ -2,10 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import SiteFooter from "./SiteFooter";
-
-const ModelViewer = dynamic(() => import("./ModelViewer"), { ssr: false });
 
 // ─── Intersection Observer Hook ─────────────────────
 function useInView(threshold = 0.15) {
@@ -99,6 +96,69 @@ function ServiceCard({
       <div className="p-6">
         <h3 className="mb-2 text-lg font-bold text-gray-900">{title}</h3>
         <p className="text-sm leading-relaxed text-gray-500">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Lazy 3D Model Viewer (only loads Three.js when scrolled into view) ───
+function LazyModelViewer() {
+  const { ref, inView } = useInView(0.05);
+  const [ModelComp, setModelComp] = useState<React.ComponentType<{
+    modelUrl: string;
+    className?: string;
+    style?: React.CSSProperties;
+  }> | null>(null);
+
+  useEffect(() => {
+    if (inView && !ModelComp) {
+      import("./ModelViewer").then((mod) => setModelComp(() => mod.default));
+    }
+  }, [inView, ModelComp]);
+
+  return (
+    <div ref={ref} className="relative mx-auto w-full max-w-md lg:max-w-none">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
+        {ModelComp ? (
+          <ModelComp
+            modelUrl="https://tvcsf7shtoelkabr.public.blob.vercel-storage.com/models/Lac-Blk-Trainers.glb"
+            className="h-[350px] w-full sm:h-[400px] lg:h-[450px]"
+          />
+        ) : (
+          <div className="flex h-[350px] w-full items-center justify-center sm:h-[400px] lg:h-[450px]">
+            <div className="text-center text-gray-500">
+              {inView ? (
+                <>
+                  <svg className="mx-auto h-10 w-10 animate-spin" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                  </svg>
+                  <p className="mt-2 text-sm">Loading 3D viewer...</p>
+                </>
+              ) : (
+                <>
+                  <svg className="mx-auto h-10 w-10" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                  </svg>
+                  <p className="mt-2 text-sm">3D Viewer</p>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="mt-4 flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-400">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-red-500" />
+          Web 3D Viewer
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-rose-500" />
+          iOS AR Ready
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-red-400" />
+          Real-time Rendering
+        </span>
       </div>
     </div>
   );
@@ -244,6 +304,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                   height={650}
                   className="object-cover"
                   priority
+                  sizes="(max-width: 768px) 90vw, 500px"
                 />
               </div>
               {/* Background decorative blobs */}
@@ -537,28 +598,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 ))}
               </div>
             </div>
-            <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-              <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
-                <ModelViewer
-                  modelUrl="https://tvcsf7shtoelkabr.public.blob.vercel-storage.com/models/Lac-Blk-Trainers.glb"
-                  className="h-[350px] w-full sm:h-[400px] lg:h-[450px]"
-                />
-              </div>
-              <div className="mt-4 flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-400">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-red-500" />
-                  Web 3D Viewer
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-rose-500" />
-                  iOS AR Ready
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-red-400" />
-                  Real-time Rendering
-                </span>
-              </div>
-            </div>
+            <LazyModelViewer />
           </div>
         </div>
       </section>
@@ -595,6 +635,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                   fill
                   className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
                   sizes="(max-width: 768px) 100vw, 1200px"
+                  loading="lazy"
                 />
               </div>
               <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-black/5" />
