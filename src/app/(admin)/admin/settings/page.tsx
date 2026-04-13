@@ -79,8 +79,13 @@ export default function SettingsAdmin() {
     }
   };
 
+  // Strip accidental domain prefix from pasted blob URLs (e.g. "https://crystalstudios.nethttps://...")
+  const cleanUrl = (value: string) =>
+    value.replace(/^https?:\/\/[^/]+(?=https?:\/\/)/, "");
+
   const update = (field: keyof SiteSettings, value: string) => {
-    setSettings((prev) => ({ ...prev, [field]: value }));
+    const cleaned = (field === "logo" || field === "favicon") ? cleanUrl(value) : value;
+    setSettings((prev) => ({ ...prev, [field]: cleaned }));
   };
 
   if (loading) {
