@@ -1,21 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Crystal Studios — logo glow pulse */
-@keyframes logo-glow {
-  0%, 100% {
-    box-shadow: 0 0 8px 2px rgba(220, 38, 38, 0.45), 0 0 20px 4px rgba(220, 38, 38, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 18px 5px rgba(220, 38, 38, 0.75), 0 0 40px 10px rgba(220, 38, 38, 0.35);
-  }
-}
-
-.logo-glow-wrap {
-  display: inline-block;
-  border-radius: 8px;
-  animation: logo-glow 3s ease-in-out infinite;
-}
 
 :root {
   --background: #ffffff;
