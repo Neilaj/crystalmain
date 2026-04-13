@@ -103,8 +103,11 @@ export default async function HomePage() {
   let headerNav: { id: string; label: string; url: string; openNew: boolean }[] = [];
   let footerNav: { id: string; label: string; url: string; openNew: boolean }[] = [];
   let homepageContent: HomepageContent = DEFAULT_HOMEPAGE_CONTENT;
+  let siteLogo = "";
 
   if (site) {
+    siteLogo = site.logo || "";
+
     const allNav = await prisma.navigation.findMany({
       where: { siteId: site.id },
       orderBy: { order: "asc" },
@@ -121,7 +124,7 @@ export default async function HomePage() {
   return (
     <>
       <HomepageJsonLd />
-      <CrystalHomepage headerNav={headerNav} footerNav={footerNav} homepageContent={homepageContent} />
+      <CrystalHomepage headerNav={headerNav} footerNav={footerNav} homepageContent={homepageContent} siteLogo={siteLogo} />
     </>
   );
 }

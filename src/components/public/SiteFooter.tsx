@@ -5,9 +5,10 @@ interface SiteFooterProps {
   socialLinkedin?: string | null;
   socialGithub?: string | null;
   socialYoutube?: string | null;
+  siteLogo?: string;
 }
 
-export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub, socialYoutube }: SiteFooterProps) {
+export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub, socialYoutube, siteLogo }: SiteFooterProps) {
   return (
     <footer className="mt-auto bg-gray-900 py-12 text-white">
       <div className="mx-auto max-w-6xl px-6">
@@ -15,12 +16,18 @@ export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-700 to-red-900">
-                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold">Crystal Studios</span>
+              {siteLogo ? (
+                <img src={siteLogo} alt="Crystal Studios" className="h-10 w-auto object-contain brightness-0 invert" />
+              ) : (
+                <>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-700 to-red-900">
+                    <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                    </svg>
+                  </div>
+                  <span className="text-lg font-bold">Crystal Studios</span>
+                </>
+              )}
             </div>
             <p className="mt-3 text-sm text-gray-300">
               Web design, custom software, 3D/AR, and AI-powered digital experiences.

@@ -178,9 +178,10 @@ interface CrystalHomepageProps {
   headerNav?: NavItem[];
   footerNav?: NavItem[];
   homepageContent?: HomepageContent;
+  siteLogo?: string;
 }
 
-export default function CrystalHomepage({ headerNav = [], footerNav = [], homepageContent }: CrystalHomepageProps) {
+export default function CrystalHomepage({ headerNav = [], footerNav = [], homepageContent, siteLogo }: CrystalHomepageProps) {
   const c = homepageContent ?? DEFAULT_HOMEPAGE_CONTENT;
   const [loaded, setLoaded] = useState(false);
 
@@ -199,12 +200,18 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-red-900/20 bg-[#1a0a0a]/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <a href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-700 to-red-900">
-              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-white">Crystal Studios</span>
+            {siteLogo ? (
+              <img src={siteLogo} alt="Crystal Studios" className="h-10 w-auto object-contain" />
+            ) : (
+              <>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-700 to-red-900">
+                  <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                  </svg>
+                </div>
+                <span className="text-lg font-bold text-white">Crystal Studios</span>
+              </>
+            )}
           </a>
           <div className="hidden items-center gap-8 sm:flex">
             {headerNav.map((item) => {
@@ -738,7 +745,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <SiteFooter />
+      <SiteFooter siteLogo={siteLogo} />
 
       {/* ═══ ASK CHRISSY ═══ */}
       <AskChrissy />
