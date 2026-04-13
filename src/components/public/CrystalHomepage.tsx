@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import SiteFooter from "./SiteFooter";
+import AskChrissy from "./AskChrissy";
 import { DEFAULT_HOMEPAGE_CONTENT, type HomepageContent } from "@/types/homepage-content";
 
 // ─── Intersection Observer Hook ─────────────────────
@@ -738,6 +739,9 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
 
       {/* ═══ FOOTER ═══ */}
       <SiteFooter />
+
+      {/* ═══ ASK CHRISSY ═══ */}
+      <AskChrissy />
     </div>
   );
 }
