@@ -653,6 +653,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
       </section>
 
       {/* ═══ PROCESS SECTION ═══ */}
+
       <section id="process" className="py-24 lg:py-32">
         <div className="mx-auto max-w-6xl px-6">
           <div

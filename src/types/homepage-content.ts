@@ -150,8 +150,8 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
         desc: "No PHP, no plugin vulnerabilities, no security patches. Modern TypeScript stack that stays secure",
       },
       {
-        title: "Content Hub Architecture",
-        desc: "Built-in topic clustering that signals topical authority to both Google and AI search engines",
+        title: "Structured for AI Discovery",
+        desc: "Every site is organized so AI engines like ChatGPT and Perplexity can understand, navigate, and cite your content with confidence",
       },
       {
         title: "Mobile-First by Design",
