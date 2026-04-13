@@ -124,7 +124,7 @@ Format as a clean numbered list.`;
 
   // Stream the response
   const stream = await client.messages.stream({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: userMessage }],
