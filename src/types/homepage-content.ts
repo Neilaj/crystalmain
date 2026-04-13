@@ -179,15 +179,31 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   },
   showcase: {
     eyebrow: "Recent Work",
-    headline: "Built to impress",
+    headline: "Built on Parsley CMS",
     items: [
       {
         href: "https://circlerootsoftware.site",
         title: "CircleRoot Software",
         description:
-          "A complete landscaping business management platform — invoicing, estimates, crew tracking, route management, and AI assistant. Built from the ground up.",
+          "A complete landscaping business management platform — invoicing, estimates, crew tracking, route management, and AI assistant.",
         imageUrl: "/images/circleroot-showcase.png",
         tag: "SaaS Platform",
+      },
+      {
+        href: "https://apmazzilli.com",
+        title: "AP Mazzilli Landscaping",
+        description:
+          "Full-service landscaping website with AI assistant, hub/spoke SEO architecture, online estimates, and content management.",
+        imageUrl: "/images/apmazzilli-showcase.png",
+        tag: "Landscaping",
+      },
+      {
+        href: "https://rblandscaping.site",
+        title: "R&B Landscaping",
+        description:
+          "Spring-themed landscaping site with AI chat, gallery, homepage editor, and Resend-powered lead capture.",
+        imageUrl: "/images/rblandscaping-showcase.png",
+        tag: "Landscaping",
       },
     ],
   },

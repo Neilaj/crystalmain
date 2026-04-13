@@ -585,7 +585,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
             </h2>
           </div>
 
-          <div className="space-y-8">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {c.showcase.items.map((item, i) => (
               <a
                 key={i}
@@ -593,31 +593,32 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group block"
+                style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-gray-300/50 transition-all duration-500 group-hover:shadow-3xl group-hover:shadow-gray-400/40 group-hover:-translate-y-1">
-                  <div className="relative aspect-[16/9] w-full">
+                <div className="relative overflow-hidden rounded-2xl shadow-lg shadow-gray-200/80 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-gray-300/60 group-hover:-translate-y-1.5">
+                  <div className="relative aspect-[4/3] w-full bg-gray-100">
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
                       fill
-                      className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
-                      sizes="(max-width: 768px) 100vw, 1200px"
+                      className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       loading="lazy"
                     />
                   </div>
-                  <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-black/5" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-8 sm:p-10">
-                    <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
+                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
+                    <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
                       <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
                       {item.tag}
                     </span>
-                    <h3 className="text-2xl font-bold text-white sm:text-3xl">{item.title}</h3>
-                    <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
+                    <h3 className="text-lg font-bold text-white">{item.title}</h3>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-white/70">
                       {item.description}
                     </p>
-                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white/90 transition-colors group-hover:text-white">
-                      Visit {item.href.replace("https://", "").replace("http://", "")}
-                      <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-white/80 transition-colors group-hover:text-white">
+                      {item.href.replace("https://", "").replace("http://", "")}
+                      <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                       </svg>
                     </span>
