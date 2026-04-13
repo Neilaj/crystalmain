@@ -5,6 +5,11 @@ import { DEFAULT_HOMEPAGE_CONTENT, type HomepageContent } from "@/types/homepage
 
 const inputClass =
   "w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-400";
+
+// Strip accidental localhost prefix pasted from browser address bar
+function cleanUrl(url: string): string {
+  return url.replace(/^https?:\/\/localhost:\d+/, "");
+}
 const textareaClass =
   "w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-400 resize-none";
 
@@ -189,7 +194,7 @@ export default function HomepageEditorPage() {
           </div>
           <div>
             <Label>Hero image URL</Label>
-            <input className={inputClass} value={config.hero.heroImageUrl} onChange={(e) => setHero({ heroImageUrl: e.target.value })} placeholder="/images/hero-person.png" />
+            <input className={inputClass} value={config.hero.heroImageUrl} onChange={(e) => setHero({ heroImageUrl: cleanUrl(e.target.value) })} placeholder="/images/hero-person.png" />
           </div>
         </SectionCard>
 
@@ -437,9 +442,9 @@ export default function HomepageEditorPage() {
                     <Label>Image URL</Label>
                     <input className={inputClass} value={item.imageUrl} onChange={(e) => {
                       const items = [...config.showcase.items];
-                      items[i] = { ...items[i], imageUrl: e.target.value };
+                      items[i] = { ...items[i], imageUrl: cleanUrl(e.target.value) };
                       setShowcase({ items });
-                    }} />
+                    }} placeholder="https://... or /images/filename.png" />
                   </div>
                 </div>
               </div>

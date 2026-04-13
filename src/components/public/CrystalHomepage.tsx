@@ -586,7 +586,14 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {c.showcase.items.map((item, i) => (
+            {c.showcase.items.map((item, i) => {
+              // Strip any accidental localhost prefix from image URLs
+              const cleanImageUrl = item.imageUrl
+                ? item.imageUrl.replace(/^https?:\/\/localhost:\d+/, "")
+                : "";
+              const isExternal = cleanImageUrl.startsWith("http://") || cleanImageUrl.startsWith("https://");
+
+              return (
               <a
                 key={i}
                 href={item.href}
@@ -597,14 +604,28 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
               >
                 <div className="relative overflow-hidden rounded-2xl shadow-lg shadow-gray-200/80 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-gray-300/60 group-hover:-translate-y-1.5">
                   <div className="relative aspect-[4/3] w-full bg-gray-100">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      loading="lazy"
-                    />
+                    {cleanImageUrl ? (
+                      isExternal ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={cleanImageUrl}
+                          alt={item.title}
+                          className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Image
+                          src={cleanImageUrl}
+                          alt={item.title}
+                          fill
+                          className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          loading="lazy"
+                        />
+                      )
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900" />
+                    )}
                   </div>
                   <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5" />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5">
@@ -625,7 +646,8 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
                   </div>
                 </div>
               </a>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
