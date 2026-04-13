@@ -17,7 +17,7 @@ export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub
           <div>
             <div className="flex items-center gap-2">
               {siteLogo ? (
-                <img src={siteLogo} alt="Crystal Studios" className="h-10 w-auto object-contain brightness-0 invert" />
+                <img src={siteLogo} alt="Crystal Studios" className="h-10 w-auto object-contain" />
               ) : (
                 <>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-700 to-red-900">
