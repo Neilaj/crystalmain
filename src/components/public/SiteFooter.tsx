@@ -22,14 +22,14 @@ export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub
               </div>
               <span className="text-lg font-bold">Crystal Studios</span>
             </div>
-            <p className="mt-3 text-sm text-gray-400">
+            <p className="mt-3 text-sm text-gray-300">
               Web design, custom software, 3D/AR, and AI-powered digital experiences.
             </p>
           </div>
           {/* Services */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Services</h4>
-            <ul className="mt-3 space-y-2 text-sm text-gray-500">
+            <ul className="mt-3 space-y-2 text-sm text-white">
               <li><Link href="/#services" className="hover:text-white transition-colors">Web Design</Link></li>
               <li><Link href="/#services" className="hover:text-white transition-colors">App Development</Link></li>
               <li><Link href="/#services" className="hover:text-white transition-colors">3D &amp; AR</Link></li>
@@ -39,7 +39,7 @@ export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub
           {/* Company */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Company</h4>
-            <ul className="mt-3 space-y-2 text-sm text-gray-500">
+            <ul className="mt-3 space-y-2 text-sm text-white">
               <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
               <li><Link href="/#work" className="hover:text-white transition-colors">Work</Link></li>
               <li><Link href="/#process" className="hover:text-white transition-colors">Process</Link></li>
@@ -51,13 +51,13 @@ export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub
             <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Contact</h4>
             <ul className="mt-3 space-y-3 text-sm">
               <li>
-                <a href="mailto:neil@crystalstudios.net" className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors">
+                <a href="mailto:neil@crystalstudios.net" className="flex items-center gap-2 text-white hover:text-red-400 transition-colors">
                   <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
                   neil@crystalstudios.net
                 </a>
               </li>
               <li>
-                <a href="tel:+19175887130" className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors">
+                <a href="tel:+19175887130" className="flex items-center gap-2 text-white hover:text-red-400 transition-colors">
                   <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" /></svg>
                   917-588-7130
                 </a>
@@ -87,7 +87,7 @@ export default function SiteFooter({ socialTwitter, socialLinkedin, socialGithub
             </div>
           </div>
         </div>
-        <div className="mt-10 border-t border-gray-800 pt-6 text-center text-xs text-gray-500">
+        <div className="mt-10 border-t border-gray-800 pt-6 text-center text-xs text-gray-300">
           &copy; {new Date().getFullYear()} Crystal Studios. All rights reserved. Powered by{" "}
           <a href="https://parsley.dev" className="text-red-500 hover:text-red-400">Parsley</a>.
         </div>
