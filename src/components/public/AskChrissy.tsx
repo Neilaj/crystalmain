@@ -363,7 +363,7 @@ export default function AskChrissy() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Hmm, something went wrong. Try emailing us at crystalwebdesign875@gmail.com instead!" },
+        { role: "assistant", content: "Hmm, something went wrong. Try emailing neil@crystalstudios.net or call 917-588-7130!" },
       ]);
     } finally {
       setSubmittingContact(false);

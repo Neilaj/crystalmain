@@ -78,7 +78,8 @@ RECENT WORK:
 - R&B Landscaping — Spring-themed landscaping site with AI chat, gallery, homepage editor, and Resend-powered lead capture.
 
 CONTACT:
-- Email: crystalwebdesign875@gmail.com
+- Email: neil@crystalstudios.net
+- Phone: 917-588-7130
 - Website: crystalstudios.net
 
 LEAD CAPTURE — CRITICAL:
