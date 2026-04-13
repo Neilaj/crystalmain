@@ -10,6 +10,22 @@ interface Message {
 // Tiny silent MP3 — used to "prime" iOS audio to route through speaker, not earpiece
 const SILENT_MP3 = "data:audio/mpeg;base64,//uQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7kMQPAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==";
 
+const LIMIT = 6;
+const COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
+const STORAGE_KEY = "chrissy_usage";
+
+function getUsage(): { count: number; resetAt: number } {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* */ }
+  return { count: 0, resetAt: 0 };
+}
+
+function saveUsage(data: { count: number; resetAt: number }) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch { /* */ }
+}
+
 export default function AskChrissy() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -20,6 +36,9 @@ export default function AskChrissy() {
   const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
   const [submittingContact, setSubmittingContact] = useState(false);
   const [pulse, setPulse] = useState(true);
+  const [isLimited, setIsLimited] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState(0);
+  const [timeLeft, setTimeLeft] = useState("");
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [pendingAudioBlob, setPendingAudioBlob] = useState<Blob | null>(null);
@@ -42,6 +61,35 @@ export default function AskChrissy() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Initialize rate limit state from localStorage
+  useEffect(() => {
+    const usage = getUsage();
+    if (usage.count >= LIMIT && Date.now() < usage.resetAt) {
+      setIsLimited(true);
+      setCooldownUntil(usage.resetAt);
+    }
+  }, []);
+
+  // Countdown timer when limited
+  useEffect(() => {
+    if (!isLimited) return;
+    const tick = () => {
+      const remaining = cooldownUntil - Date.now();
+      if (remaining <= 0) {
+        setIsLimited(false);
+        saveUsage({ count: 0, resetAt: 0 });
+        setTimeLeft("");
+        return;
+      }
+      const m = Math.floor(remaining / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      setTimeLeft(`${m}:${s.toString().padStart(2, "0")}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [isLimited, cooldownUntil]);
 
   // Initialize a persistent audio element on first open — keeps iOS in speaker mode
   useEffect(() => {
@@ -156,6 +204,19 @@ export default function AskChrissy() {
   const sendMessage = useCallback(async (text: string, fromMic = false) => {
     if (!text.trim() || isStreaming) return;
 
+    // Check rate limit
+    const usage = getUsage();
+    if (usage.count >= LIMIT) {
+      if (Date.now() < usage.resetAt) {
+        setIsLimited(true);
+        setCooldownUntil(usage.resetAt);
+        setShowContactForm(true);
+        return;
+      }
+      // Cooldown expired — reset
+      saveUsage({ count: 0, resetAt: 0 });
+    }
+
     const userMessage: Message = { role: "user", content: text.trim() };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
@@ -186,7 +247,23 @@ export default function AskChrissy() {
 
       setMessages((prev) => [...prev, { role: "assistant", content: cleanText }]);
 
-      if (hasContactForm) {
+      // Increment usage count
+      const currentUsage = getUsage();
+      const newCount = currentUsage.count + 1;
+      const resetAt = currentUsage.resetAt || Date.now() + COOLDOWN_MS;
+      saveUsage({ count: newCount, resetAt });
+      if (newCount >= LIMIT) {
+        setIsLimited(true);
+        setCooldownUntil(resetAt);
+        // Show limit message then contact form after a short delay
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: "You've reached the limit for now — I want to make sure everyone gets a chance to chat! Drop your info below and we'll personally follow up. Come back in 30 minutes to keep chatting." },
+        ]);
+        setShowContactForm(true);
+      }
+
+      if (hasContactForm && newCount < LIMIT) {
         setShowContactForm(true);
       }
 
@@ -517,47 +594,56 @@ export default function AskChrissy() {
 
         {/* Input */}
         <div className="border-t border-gray-100 bg-white px-3 py-3">
-          <div className="flex items-end gap-2">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage(input);
-                }
-              }}
-              placeholder={isListening ? "Listening..." : "Ask me anything..."}
-              rows={1}
-              className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-400 transition-colors"
-            />
-            {/* Mic button */}
-            <button
-              onClick={toggleListening}
-              disabled={isStreaming}
-              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-all ${
-                isListening
-                  ? "bg-red-500 text-white animate-pulse"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 disabled:opacity-40"
-              }`}
-              title={isListening ? "Stop listening" : "Speak your question"}
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+          {isLimited ? (
+            <div className="flex items-center justify-center gap-2 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-500">
+              <svg className="h-4 w-4 flex-shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-            </button>
-            {/* Send button */}
-            <button
-              onClick={() => sendMessage(input)}
-              disabled={!input.trim() || isStreaming}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-red-700 text-white transition-all hover:bg-red-800 disabled:opacity-40 disabled:hover:bg-red-700"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-              </svg>
-            </button>
-          </div>
+              {timeLeft ? `Back in ${timeLeft}` : "Limit reached — check back in 30 min"}
+            </div>
+          ) : (
+            <div className="flex items-end gap-2">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(input);
+                  }
+                }}
+                placeholder={isListening ? "Listening..." : "Ask me anything..."}
+                rows={1}
+                className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-red-400 transition-colors"
+              />
+              {/* Mic button */}
+              <button
+                onClick={toggleListening}
+                disabled={isStreaming}
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-all ${
+                  isListening
+                    ? "bg-red-500 text-white animate-pulse"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 disabled:opacity-40"
+                }`}
+                title={isListening ? "Stop listening" : "Speak your question"}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                </svg>
+              </button>
+              {/* Send button */}
+              <button
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || isStreaming}
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-red-700 text-white transition-all hover:bg-red-800 disabled:opacity-40 disabled:hover:bg-red-700"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                </svg>
+              </button>
+            </div>
+          )}
           <p className="mt-1.5 text-center text-[10px] text-gray-300">
             Crystal Studios &middot; crystalstudios.net
           </p>
