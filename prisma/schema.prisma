@@ -57,6 +57,9 @@ model Site {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Homepage content (editable from admin)
+  homepageContent Json?
+
   // Enabled modules/features
   enabledFeatures String[] @default(["contact-form"])
 

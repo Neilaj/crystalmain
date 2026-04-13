@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import SiteFooter from "./SiteFooter";
+import { DEFAULT_HOMEPAGE_CONTENT, type HomepageContent } from "@/types/homepage-content";
 
 // ─── Intersection Observer Hook ─────────────────────
 function useInView(threshold = 0.15) {
@@ -175,9 +176,11 @@ interface NavItem {
 interface CrystalHomepageProps {
   headerNav?: NavItem[];
   footerNav?: NavItem[];
+  homepageContent?: HomepageContent;
 }
 
-export default function CrystalHomepage({ headerNav = [], footerNav = [] }: CrystalHomepageProps) {
+export default function CrystalHomepage({ headerNav = [], footerNav = [], homepageContent }: CrystalHomepageProps) {
+  const c = homepageContent ?? DEFAULT_HOMEPAGE_CONTENT;
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -298,7 +301,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
             <div className="relative mx-auto max-w-md">
               <div className="relative overflow-hidden rounded-3xl">
                 <Image
-                  src="/images/hero-person.png"
+                  src={c.hero.heroImageUrl || "/images/hero-person.png"}
                   alt="Crystal Studios — We build digital experiences"
                   width={500}
                   height={650}
@@ -325,7 +328,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
               </span>
               <span className="text-xs font-semibold tracking-wide text-red-300">
-                Now accepting projects for 2026
+                {c.hero.badge}
               </span>
             </div>
 
@@ -334,9 +337,9 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              We build{" "}
+              {c.hero.headline}{" "}
               <span className="bg-gradient-to-r from-red-400 via-rose-400 to-red-300 bg-clip-text text-transparent">
-                digital experiences
+                {c.hero.highlight}
               </span>{" "}
               that move people.
             </h1>
@@ -346,7 +349,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              Web design, custom software, mobile apps, interactive 3D product experiences, AR on iOS, AI-powered video — everything your business needs to dominate online.
+              {c.hero.subtext}
             </p>
 
             <div
@@ -358,7 +361,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 href="#contact"
                 className="group inline-flex items-center gap-2 rounded-full bg-red-600 px-7 py-3.5 text-sm font-semibold text-white transition-all hover:bg-red-500 hover:shadow-xl hover:shadow-red-600/20"
               >
-                Start a project
+                {c.hero.cta1Text}
                 <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
@@ -367,7 +370,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 href="#work"
                 className="inline-flex items-center gap-2 rounded-full border border-white/20 px-7 py-3.5 text-sm font-semibold text-white transition-all hover:border-white/40 hover:bg-white/5"
               >
-                View our work
+                {c.hero.cta2Text}
               </a>
             </div>
           </div>
@@ -391,59 +394,27 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
         <div className="mx-auto max-w-6xl px-6">
           <div className="mb-16 text-center">
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-red-700">
-              What we do
+              {c.services.eyebrow}
             </p>
             <h2 className="mx-auto max-w-2xl text-3xl font-extrabold leading-tight text-gray-900 sm:text-4xl lg:text-5xl">
-              Everything your brand needs to{" "}
+              {c.services.headline}{" "}
               <span className="bg-gradient-to-r from-red-700 to-red-500 bg-clip-text text-transparent">
-                dominate online
+                {c.services.highlight}
               </span>
             </h2>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <ServiceCard
-              delay={0}
-              tag="Web"
-              image="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"
-              title="Web Design & Development"
-              description="Pixel-perfect, blazing-fast websites built with modern frameworks. Optimized for AI search engines so your content gets cited, not buried."
-            />
-            <ServiceCard
-              delay={100}
-              tag="Mobile"
-              image="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop"
-              title="App Development"
-              description="Native and cross-platform mobile apps that users love. From concept to App Store, experiences that feel intuitive and perform flawlessly."
-            />
-            <ServiceCard
-              delay={200}
-              tag="AR / 3D"
-              image="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?w=600&h=400&fit=crop"
-              title="3D for Web & AR on iOS"
-              description="We build interactive 3D product viewers for the web and native AR experiences on iOS using ARKit and USDZ. Customers can place your products in their real space before buying."
-            />
-            <ServiceCard
-              delay={300}
-              tag="AI Video"
-              image="https://images.unsplash.com/photo-1626379953822-baec19c3accd?w=600&h=400&fit=crop"
-              title="AI Video Production"
-              description="AI-generated social media videos that stop the scroll. Thumb-stopping content at scale — reels, shorts, and stories that convert."
-            />
-            <ServiceCard
-              delay={400}
-              tag="Strategy"
-              image="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
-              title="Digital Strategy"
-              description="SEO, analytics, conversion optimization, and growth planning. We don't just build — we help you win with data-driven strategy."
-            />
-            <ServiceCard
-              delay={500}
-              tag="Software"
-              image="/images/custom-software-box.png"
-              title="Custom Software Development"
-              description="We build complete SaaS platforms and business management tools from the ground up. Invoicing, CRM, scheduling, crew management — whatever your business needs to run smarter."
-            />
+            {c.services.items.map((svc, i) => (
+              <ServiceCard
+                key={i}
+                delay={i * 100}
+                tag={svc.tag}
+                image={svc.imageUrl}
+                title={svc.title}
+                description={svc.description}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -457,29 +428,23 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
                 </svg>
-                Our Advantage
+                {c.parsley.eyebrow}
               </span>
               <h2 className="mb-6 text-3xl font-extrabold leading-snug text-gray-900 sm:text-4xl lg:text-5xl">
-                Built on{" "}
+                {c.parsley.headline}{" "}
                 <span className="bg-gradient-to-r from-red-700 to-red-500 bg-clip-text text-transparent pb-1 inline-block">
-                  Parsley
+                  {c.parsley.highlight}
                 </span>
                 , our proprietary AI-first platform
               </h2>
               <p className="mb-6 text-lg leading-relaxed text-gray-500">
-                Every website we build runs on Parsley — our proprietary CMS platform engineered from the ground up to be visible to AI search engines like ChatGPT, Perplexity, and Google AI Overviews.
+                {c.parsley.para1}
               </p>
               <p className="mb-8 text-lg leading-relaxed text-gray-500">
-                While other agencies build on WordPress and hope for the best, we give your business a structural advantage. Your site automatically generates the structured data, content hubs, and semantic markup that AI engines need to find, understand, and cite your content.
+                {c.parsley.para2}
               </p>
               <div className="space-y-4">
-                {[
-                  { title: "AI Search Optimized", desc: "Auto-generated llms.txt, Schema.org JSON-LD, and semantic HTML — your content gets cited, not buried" },
-                  { title: "Blazing Fast", desc: "Server-side rendered with Next.js and edge caching. Sub-second load times, every page" },
-                  { title: "Unhackable by Design", desc: "No PHP, no plugin vulnerabilities, no security patches. Modern TypeScript stack that stays secure" },
-                  { title: "Content Hub Architecture", desc: "Built-in topic clustering that signals topical authority to both Google and AI search engines" },
-                  { title: "Mobile-First by Design", desc: "Every site is responsive from day one. Google uses mobile-first indexing — our sites are built for it, not retrofitted" },
-                ].map((item) => (
+                {c.parsley.features.map((item) => (
                   <div key={item.title} className="flex gap-3">
                     <div className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
                       <svg className="h-3 w-3 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
@@ -572,26 +537,26 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
                 </svg>
-                3D & Augmented Reality
+                {c.ar.badge}
               </span>
               <h2 className="mb-6 text-2xl font-extrabold leading-tight sm:text-3xl lg:text-5xl">
-                Your products in{" "}
+                {c.ar.headline}{" "}
                 <span className="bg-gradient-to-r from-red-400 to-rose-400 bg-clip-text text-transparent">
-                  3D on the web
+                  {c.ar.highlight1}
                 </span>{" "}
                 and{" "}
                 <span className="bg-gradient-to-r from-rose-400 to-red-500 bg-clip-text text-transparent">
-                  AR on iOS
+                  {c.ar.highlight2}
                 </span>
               </h2>
               <p className="mb-6 text-base leading-relaxed text-gray-300 sm:text-lg">
-                We create photorealistic 3D models of your physical products and deploy them as interactive viewers on your website — customers can rotate, zoom, and inspect every detail.
+                {c.ar.para1}
               </p>
               <p className="mb-8 text-base leading-relaxed text-gray-300 sm:text-lg">
-                For iOS, we build native AR experiences using ARKit and USDZ. Your customers tap a button and see your product in their real space — on their desk, in their room, at true scale. No app download required.
+                {c.ar.para2}
               </p>
               <div className="flex flex-wrap gap-3">
-                {["GLB / glTF Models", "USDZ for iOS AR", "ARKit Integration", "Three.js Viewers", "Product Configurators", "WebXR"].map((tag) => (
+                {c.ar.tags.map((tag) => (
                   <span key={tag} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-300">
                     {tag}
                   </span>
@@ -613,50 +578,54 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
             }`}
           >
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-red-600">
-              Recent Work
+              {c.showcase.eyebrow}
             </p>
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
-              Built to impress
+              {c.showcase.headline}
             </h2>
           </div>
 
-          {/* CircleRoot Showcase */}
-          <a
-            href="https://circlerootsoftware.site"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group block"
-          >
-            <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-gray-300/50 transition-all duration-500 group-hover:shadow-3xl group-hover:shadow-gray-400/40 group-hover:-translate-y-1">
-              <div className="relative aspect-[16/9] w-full">
-                <Image
-                  src="/images/circleroot-showcase.png"
-                  alt="CircleRoot — Landscaping business management platform"
-                  fill
-                  className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
-                  sizes="(max-width: 768px) 100vw, 1200px"
-                  loading="lazy"
-                />
-              </div>
-              <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-black/5" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-8 sm:p-10">
-                <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-                  SaaS Platform
-                </span>
-                <h3 className="text-2xl font-bold text-white sm:text-3xl">CircleRoot Software</h3>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
-                  A complete landscaping business management platform — invoicing, estimates, crew tracking, route management, and AI assistant. Built from the ground up.
-                </p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white/90 transition-colors group-hover:text-white">
-                  Visit circlerootsoftware.site
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </a>
+          <div className="space-y-8">
+            {c.showcase.items.map((item, i) => (
+              <a
+                key={i}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block"
+              >
+                <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-gray-300/50 transition-all duration-500 group-hover:shadow-3xl group-hover:shadow-gray-400/40 group-hover:-translate-y-1">
+                  <div className="relative aspect-[16/9] w-full">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.title}
+                      fill
+                      className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
+                      sizes="(max-width: 768px) 100vw, 1200px"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-black/5" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-8 sm:p-10">
+                    <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+                      {item.tag}
+                    </span>
+                    <h3 className="text-2xl font-bold text-white sm:text-3xl">{item.title}</h3>
+                    <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
+                      {item.description}
+                    </p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-white/90 transition-colors group-hover:text-white">
+                      Visit {item.href.replace("https://", "").replace("http://", "")}
+                      <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -670,82 +639,39 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
             }`}
           >
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-red-700">
-              Our Process
+              {c.process.eyebrow}
             </p>
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
-              From idea to launch,{" "}
+              {c.process.headline}{" "}
               <span className="bg-gradient-to-r from-red-600 to-rose-500 bg-clip-text text-transparent">
-                crystal clear.
+                {c.process.highlight}
               </span>
             </h2>
           </div>
 
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                step: "01",
-                title: "Discover",
-                description: "We dive deep into your brand, audience, and goals to understand the full picture.",
-                color: "bg-red-100 text-red-700",
-                border: "border-red-200",
-                icon: (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                  </svg>
-                ),
-              },
-              {
-                step: "02",
-                title: "Design",
-                description: "Pixel-perfect designs that balance beauty and function. Every interaction is intentional.",
-                color: "bg-rose-100 text-rose-700",
-                border: "border-rose-200",
-                icon: (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
-                  </svg>
-                ),
-              },
-              {
-                step: "03",
-                title: "Develop",
-                description: "Clean code, modern frameworks, blazing performance. AI search optimization baked in from day one.",
-                color: "bg-rose-100 text-rose-700",
-                border: "border-rose-200",
-                icon: (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m6.75 7.5 3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0 0 21 18V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25Z" />
-                  </svg>
-                ),
-              },
-              {
-                step: "04",
-                title: "Launch & Grow",
-                description: "Launch is just the beginning. We monitor, optimize, and help you scale continuously.",
-                color: "bg-amber-100 text-amber-600",
-                border: "border-amber-200",
-                icon: (
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-                  </svg>
-                ),
-              },
-            ].map((item, i) => {
+            {c.process.steps.map((item, i) => {
+              const colors = [
+                { color: "bg-red-100 text-red-700", border: "border-red-200" },
+                { color: "bg-rose-100 text-rose-700", border: "border-rose-200" },
+                { color: "bg-rose-100 text-rose-700", border: "border-rose-200" },
+                { color: "bg-amber-100 text-amber-600", border: "border-amber-200" },
+              ];
+              const { color, border } = colors[i % colors.length];
               // eslint-disable-next-line react-hooks/rules-of-hooks
               const { ref, inView } = useInView(0.2);
               return (
                 <div
                   key={item.step}
                   ref={ref}
-                  className={`rounded-2xl border ${item.border} bg-white p-6 transition-all duration-700 hover:shadow-lg ${
+                  className={`rounded-2xl border ${border} bg-white p-6 transition-all duration-700 hover:shadow-lg ${
                     inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                   }`}
                   style={{ transitionDelay: `${i * 100}ms` }}
                 >
-                  <div className={`mb-4 inline-flex rounded-xl ${item.color} p-3`}>
-                    {item.icon}
+                  <div className={`mb-4 inline-flex rounded-xl ${color} px-3 py-1.5`}>
+                    <span className="text-sm font-bold">{item.step}</span>
                   </div>
-                  <p className="mb-1 text-xs font-bold text-gray-400">{item.step}</p>
                   <h3 className="mb-2 text-xl font-bold text-gray-900">{item.title}</h3>
                   <p className="text-sm leading-relaxed text-gray-500">{item.description}</p>
                 </div>
@@ -770,14 +696,13 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [] }: Crys
 
             <div className="relative z-10">
               <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
-                Ready to build something{" "}
+                {c.cta.headline}{" "}
                 <span className="bg-gradient-to-r from-red-400 via-rose-400 to-red-300 bg-clip-text text-transparent">
-                  extraordinary?
+                  {c.cta.highlight}
                 </span>
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-lg text-gray-400">
-                Let&apos;s talk about your vision. We&apos;ll craft a digital experience that
-                sets your brand apart.
+                {c.cta.subtext}
               </p>
               <div className="mt-10 mx-auto max-w-lg">
                 <HomepageContactForm />

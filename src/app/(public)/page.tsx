@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import CrystalHomepage from "@/components/public/CrystalHomepage";
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_HOMEPAGE_CONTENT, type HomepageContent } from "@/types/homepage-content";
 
 export const metadata: Metadata = {
   title: "Crystal Studios — We Build Digital Experiences That Move People",
@@ -98,10 +99,10 @@ function HomepageJsonLd() {
 }
 
 export default async function HomePage() {
-  // Fetch navigation from database
   const site = await prisma.site.findFirst();
   let headerNav: { id: string; label: string; url: string; openNew: boolean }[] = [];
   let footerNav: { id: string; label: string; url: string; openNew: boolean }[] = [];
+  let homepageContent: HomepageContent = DEFAULT_HOMEPAGE_CONTENT;
 
   if (site) {
     const allNav = await prisma.navigation.findMany({
@@ -111,12 +112,16 @@ export default async function HomePage() {
     });
     headerNav = allNav.filter((n) => n.location === "HEADER" || n.location === "BOTH");
     footerNav = allNav.filter((n) => n.location === "FOOTER" || n.location === "BOTH");
+
+    if (site.homepageContent && typeof site.homepageContent === "object") {
+      homepageContent = { ...DEFAULT_HOMEPAGE_CONTENT, ...(site.homepageContent as unknown as HomepageContent) };
+    }
   }
 
   return (
     <>
       <HomepageJsonLd />
-      <CrystalHomepage headerNav={headerNav} footerNav={footerNav} />
+      <CrystalHomepage headerNav={headerNav} footerNav={footerNav} homepageContent={homepageContent} />
     </>
   );
 }
