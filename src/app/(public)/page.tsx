@@ -3,6 +3,9 @@ import CrystalHomepage from "@/components/public/CrystalHomepage";
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_HOMEPAGE_CONTENT, type HomepageContent } from "@/types/homepage-content";
 
+// Always fetch fresh data so homepage editor changes appear immediately
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Crystal Studios — We Build Digital Experiences That Move People",
   description:
