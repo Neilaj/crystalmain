@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
+import AskChrissy from "@/components/public/AskChrissy";
 
 interface HubPageProps {
   params: Promise<{ slug: string }>;
@@ -189,6 +190,7 @@ export default async function HubPage({ params }: HubPageProps) {
       </main>
 
       <SiteFooter siteLogo={site?.logo} />
+      <AskChrissy />
     </>
   );
 }

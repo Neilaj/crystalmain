@@ -7,6 +7,7 @@ import Link from "next/link";
 import PageContent from "@/components/public/PageContent";
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
+import AskChrissy from "@/components/public/AskChrissy";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -228,6 +229,7 @@ export default async function DynamicPage({ params }: PageProps) {
         socialGithub={site?.socialGithub}
         socialYoutube={site?.socialYoutube}
       />
+      <AskChrissy />
     </div>
   );
 }

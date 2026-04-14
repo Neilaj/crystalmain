@@ -6,6 +6,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
+import AskChrissy from "@/components/public/AskChrissy";
 
 interface CollectionProps {
   params: Promise<{ name: string }>;
@@ -98,6 +99,7 @@ export default async function CollectionPage({ params }: CollectionProps) {
       </main>
 
       <SiteFooter siteLogo={site?.logo} />
+      <AskChrissy />
     </div>
   );
 }
