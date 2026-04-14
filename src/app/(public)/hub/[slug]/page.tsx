@@ -3,6 +3,8 @@ import { getSite } from "@/lib/get-site";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import SiteHeader from "@/components/public/SiteHeader";
+import SiteFooter from "@/components/public/SiteFooter";
 
 interface HubPageProps {
   params: Promise<{ slug: string }>;
@@ -86,19 +88,7 @@ export default async function HubPage({ params }: HubPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-lg">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Link href="/" className="text-lg font-bold text-gray-900">{siteName}</Link>
-          <nav className="hidden items-center gap-8 md:flex">
-            {navItems.map((item) => (
-              <Link key={item.id} href={item.url} className="text-sm text-gray-600 hover:text-gray-900">
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <SiteHeader siteLogo={site?.logo} navigation={site?.navigation} />
 
       <main className="mx-auto max-w-6xl px-6">
         {/* Breadcrumb */}
@@ -198,12 +188,7 @@ export default async function HubPage({ params }: HubPageProps) {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 bg-gray-50 py-12">
-        <div className="mx-auto max-w-6xl px-6 text-center text-sm text-gray-500">
-          {site?.footerText || `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`}
-        </div>
-      </footer>
+      <SiteFooter siteLogo={site?.logo} />
     </>
   );
 }
