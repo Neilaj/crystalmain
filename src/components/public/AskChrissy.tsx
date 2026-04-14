@@ -417,19 +417,14 @@ export default function AskChrissy() {
     setSubmittingContact(true);
 
     try {
-      const res = await fetch("/api/forms/submit", {
+      const res = await fetch("/api/ai/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          formSlug: "contact",
-          data: {
-            name: contactData.name,
-            email: contactData.email,
-            phone: contactData.phone,
-            message: contactData.message || "Project inquiry via Ask Chrissy chat assistant",
-            source: "Ask Chrissy Chat",
-          },
-          _loadedAt: Date.now() - 10000,
+          name: contactData.name,
+          email: contactData.email,
+          phone: contactData.phone,
+          message: contactData.message,
         }),
       });
 
