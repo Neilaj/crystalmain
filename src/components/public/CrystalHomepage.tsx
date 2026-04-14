@@ -209,11 +209,7 @@ interface CrystalHomepageProps {
 
 export default function CrystalHomepage({ headerNav = [], footerNav = [], homepageContent, siteLogo }: CrystalHomepageProps) {
   const c = homepageContent ?? DEFAULT_HOMEPAGE_CONTENT;
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
+  // Hero entrance animations are CSS-only (no JS state needed) → better LCP
 
   const statsSection = useInView(0.2);
   const processSection = useInView(0.15);
@@ -327,20 +323,17 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
 
         <div className="relative z-10 mx-auto flex max-w-6xl flex-col-reverse items-center px-6 pt-8 lg:flex-row lg:items-center lg:gap-16 lg:pt-16">
           {/* Left — Hero Person Image */}
-          <div
-            className={`mt-12 flex-1 lg:mt-0 transition-all duration-1000 delay-300 ${
-              loaded ? "opacity-100 translate-x-0 scale-100" : "opacity-0 -translate-x-12 scale-95"
-            }`}
-          >
+          <div className="mt-12 flex-1 lg:mt-0 hero-slide-in hero-delay-2">
             <div className="relative mx-auto max-w-md">
               <div className="relative overflow-hidden rounded-3xl">
                 <Image
-                  src={c.hero.heroImageUrl || "/images/hero-person.png"}
+                  src={c.hero.heroImageUrl || "/images/hero-person.webp"}
                   alt="Crystal Studios — We build digital experiences"
                   width={500}
                   height={650}
                   className="object-cover"
                   priority
+                  fetchPriority="high"
                   sizes="(max-width: 768px) 90vw, 500px"
                 />
               </div>
@@ -352,11 +345,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
 
           {/* Right — Text */}
           <div className="flex-1 text-center lg:text-left">
-            <div
-              className={`mb-6 inline-flex items-center gap-2 rounded-full border border-red-400/30 bg-red-600/10 px-4 py-1.5 transition-all duration-1000 ${
-                loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-            >
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-red-400/30 bg-red-600/10 px-4 py-1.5 hero-fade-up hero-delay-0">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
@@ -366,11 +355,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
               </span>
             </div>
 
-            <h1
-              className={`mb-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl transition-all duration-1000 delay-200 ${
-                loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-            >
+            <h1 className="mb-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl hero-fade-up hero-delay-1">
               {c.hero.headline}{" "}
               <span className="bg-gradient-to-r from-red-400 via-rose-400 to-red-300 bg-clip-text text-transparent">
                 {c.hero.highlight}
@@ -378,19 +363,11 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
               that move people.
             </h1>
 
-            <p
-              className={`mb-8 max-w-lg text-lg leading-relaxed text-gray-400 sm:text-xl lg:mx-0 mx-auto transition-all duration-1000 delay-400 ${
-                loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-            >
+            <p className="mb-8 max-w-lg text-lg leading-relaxed text-gray-400 sm:text-xl lg:mx-0 mx-auto hero-fade-up hero-delay-2">
               {c.hero.subtext}
             </p>
 
-            <div
-              className={`flex flex-col items-center gap-3 sm:flex-row lg:justify-start justify-center transition-all duration-1000 delay-500 ${
-                loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-            >
+            <div className="flex flex-col items-center gap-3 sm:flex-row lg:justify-start justify-center hero-fade-up hero-delay-3">
               <a
                 href="#contact"
                 className="group inline-flex items-center gap-2 rounded-full bg-red-600 px-7 py-3.5 text-sm font-semibold text-white transition-all hover:bg-red-500 hover:shadow-xl hover:shadow-red-600/20"
@@ -411,11 +388,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
         </div>
 
         {/* Scroll indicator */}
-        <div
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 transition-all duration-1000 delay-700 ${
-            loaded ? "opacity-100" : "opacity-0"
-          }`}
-        >
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hero-fade-in hero-delay-6">
           <div className="flex flex-col items-center gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">Scroll</span>
             <div className="h-10 w-[1px] bg-gradient-to-b from-gray-500 to-transparent scroll-line" />

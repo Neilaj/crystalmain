@@ -124,8 +124,13 @@ export default async function HomePage() {
     }
   }
 
+  // Determine hero image src for preload hint
+  const heroImageSrc = (homepageContent as HomepageContent & { hero?: { heroImageUrl?: string } })?.hero?.heroImageUrl || "/images/hero-person.webp";
+
   return (
     <>
+      {/* Preload hero image so browser fetches it as early as possible → lower LCP */}
+      <link rel="preload" as="image" href={heroImageSrc} fetchPriority="high" />
       <HomepageJsonLd />
       <CrystalHomepage headerNav={headerNav} footerNav={footerNav} homepageContent={homepageContent} siteLogo={siteLogo} />
     </>
