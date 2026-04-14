@@ -27,36 +27,28 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ── Hero entrance animations (CSS-only, no JS needed → better LCP) ── */
+/* ── Hero entrance animations ──
+   opacity is intentionally NOT animated — content is always visible so
+   Lighthouse/crawlers measure LCP immediately. Only transform animates. ── */
 @keyframes heroFadeUp {
-  from { opacity: 0; transform: translateY(1.5rem); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes heroFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { transform: translateY(1rem); }
+  to   { transform: translateY(0); }
 }
 @keyframes heroSlideIn {
-  from { opacity: 0; transform: translateX(-2rem) scale(0.97); }
-  to   { opacity: 1; transform: translateX(0) scale(1); }
+  from { transform: translateX(-1.5rem) scale(0.98); }
+  to   { transform: translateX(0) scale(1); }
 }
 
-.hero-fade-up {
-  animation: heroFadeUp 0.8s ease-out both;
-}
-.hero-fade-in {
-  animation: heroFadeIn 0.8s ease-out both;
-}
-.hero-slide-in {
-  animation: heroSlideIn 0.9s ease-out both;
-}
-.hero-delay-0  { animation-delay: 0ms; }
-.hero-delay-1  { animation-delay: 100ms; }
-.hero-delay-2  { animation-delay: 200ms; }
-.hero-delay-3  { animation-delay: 300ms; }
-.hero-delay-4  { animation-delay: 400ms; }
-.hero-delay-5  { animation-delay: 500ms; }
-.hero-delay-6  { animation-delay: 600ms; }
+.hero-fade-up   { animation: heroFadeUp  0.7s ease-out both; }
+.hero-fade-in   { animation: heroFadeUp  0.7s ease-out both; }
+.hero-slide-in  { animation: heroSlideIn 0.8s ease-out both; }
+.hero-delay-0   { animation-delay: 0ms; }
+.hero-delay-1   { animation-delay: 80ms; }
+.hero-delay-2   { animation-delay: 160ms; }
+.hero-delay-3   { animation-delay: 240ms; }
+.hero-delay-4   { animation-delay: 320ms; }
+.hero-delay-5   { animation-delay: 400ms; }
+.hero-delay-6   { animation-delay: 480ms; }
 
 /* Tiptap Editor Styles */
 .tiptap {
