@@ -12,18 +12,23 @@ const SILENT_MP3 = "data:audio/mpeg;base64,//uQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVV
 
 const LIMIT = 6;
 const COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
-const STORAGE_KEY = "chrissy_usage";
+const STORAGE_KEY = "chrissy_cooldown";
 
-function getUsage(): { count: number; resetAt: number } {
+// Only the cooldown end-time is persisted — question count resets each page visit
+function getCooldownUntil(): number {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch { /* */ }
-  return { count: 0, resetAt: 0 };
+  return 0;
 }
 
-function saveUsage(data: { count: number; resetAt: number }) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch { /* */ }
+function saveCooldown(resetAt: number) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(resetAt)); } catch { /* */ }
+}
+
+function clearCooldown() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch { /* */ }
 }
 
 export default function AskChrissy() {
@@ -39,6 +44,7 @@ export default function AskChrissy() {
   const [isLimited, setIsLimited] = useState(false);
   const [cooldownUntil, setCooldownUntil] = useState(0);
   const [timeLeft, setTimeLeft] = useState("");
+  const [questionCount, setQuestionCount] = useState(0);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [pendingAudioBlob, setPendingAudioBlob] = useState<Blob | null>(null);
@@ -62,12 +68,12 @@ export default function AskChrissy() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Initialize rate limit state from localStorage
+  // On mount: check if a sitewide cooldown is still active
   useEffect(() => {
-    const usage = getUsage();
-    if (usage.count >= LIMIT && Date.now() < usage.resetAt) {
+    const resetAt = getCooldownUntil();
+    if (resetAt && Date.now() < resetAt) {
       setIsLimited(true);
-      setCooldownUntil(usage.resetAt);
+      setCooldownUntil(resetAt);
     }
   }, []);
 
@@ -78,7 +84,8 @@ export default function AskChrissy() {
       const remaining = cooldownUntil - Date.now();
       if (remaining <= 0) {
         setIsLimited(false);
-        saveUsage({ count: 0, resetAt: 0 });
+        setQuestionCount(0);
+        clearCooldown();
         setTimeLeft("");
         return;
       }
@@ -204,17 +211,17 @@ export default function AskChrissy() {
   const sendMessage = useCallback(async (text: string, fromMic = false) => {
     if (!text.trim() || isStreaming) return;
 
-    // Check rate limit
-    const usage = getUsage();
-    if (usage.count >= LIMIT) {
-      if (Date.now() < usage.resetAt) {
-        setIsLimited(true);
-        setCooldownUntil(usage.resetAt);
-        setShowContactForm(true);
-        return;
-      }
-      // Cooldown expired — reset
-      saveUsage({ count: 0, resetAt: 0 });
+    // Check for active sitewide cooldown
+    const resetAt = getCooldownUntil();
+    if (resetAt && Date.now() < resetAt) {
+      setIsLimited(true);
+      setCooldownUntil(resetAt);
+      setShowContactForm(true);
+      return;
+    }
+    if (resetAt && Date.now() >= resetAt) {
+      clearCooldown();
+      setQuestionCount(0);
     }
 
     const userMessage: Message = { role: "user", content: text.trim() };
@@ -247,23 +254,22 @@ export default function AskChrissy() {
 
       setMessages((prev) => [...prev, { role: "assistant", content: cleanText }]);
 
-      // Increment usage count
-      const currentUsage = getUsage();
-      const newCount = currentUsage.count + 1;
-      const resetAt = currentUsage.resetAt || Date.now() + COOLDOWN_MS;
-      saveUsage({ count: newCount, resetAt });
+      // Increment per-page question count (lives in state, resets on navigation)
+      const newCount = questionCount + 1;
+      setQuestionCount(newCount);
+
       if (newCount >= LIMIT) {
+        // Lock sitewide for 30 mins — persist only the cooldown end time
+        const cooldownEnd = Date.now() + COOLDOWN_MS;
+        saveCooldown(cooldownEnd);
         setIsLimited(true);
-        setCooldownUntil(resetAt);
-        // Show limit message then contact form after a short delay
+        setCooldownUntil(cooldownEnd);
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: "You've reached the limit for now — I want to make sure everyone gets a chance to chat! Drop your info below and we'll personally follow up. Come back in 30 minutes to keep chatting." },
         ]);
         setShowContactForm(true);
-      }
-
-      if (hasContactForm && newCount < LIMIT) {
+      } else if (hasContactForm) {
         setShowContactForm(true);
       }
 
