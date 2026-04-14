@@ -65,6 +65,7 @@ export default function PageEditor({ page, isNew }: PageEditorProps) {
   const [excerpt, setExcerpt] = useState(page?.excerpt || "");
   const [hubId, setHubId] = useState(page?.hubId || page?.hub?.id || "");
   const [hubs, setHubs] = useState<HubOption[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
 
@@ -159,8 +160,8 @@ export default function PageEditor({ page, isNew }: PageEditorProps) {
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      {/* Header — sticky so Save/Publish buttons are always reachable */}
+      <div className="mb-6 flex items-center justify-between sticky top-0 z-50 bg-white/60 backdrop-blur-xl py-3 -mx-2 px-2 border-b border-white/30">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
             {isNew ? "New Page" : "Edit Page"}
@@ -201,9 +202,34 @@ export default function PageEditor({ page, isNew }: PageEditorProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-4">
+      {/* Sidebar toggle */}
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          {sidebarOpen ? (
+            <>
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
+              Hide Sidebar
+            </>
+          ) : (
+            <>
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+              </svg>
+              Show Sidebar
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className={`grid grid-cols-1 gap-6 ${sidebarOpen ? "lg:grid-cols-3" : ""}`}>
+        {/* Main Content — expands to full width when sidebar is hidden */}
+        <div className={`${sidebarOpen ? "lg:col-span-2" : ""} space-y-4`}>
           {/* Title */}
           <input
             type="text"
@@ -233,8 +259,8 @@ export default function PageEditor({ page, isNew }: PageEditorProps) {
           />
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-4">
+        {/* Sidebar — sticky so it follows scroll, hidden when toggled */}
+        <div className={`space-y-4 ${sidebarOpen ? "lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto" : "hidden"}`}>
           {/* Status */}
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <label className="mb-2 block text-sm font-medium text-gray-700">

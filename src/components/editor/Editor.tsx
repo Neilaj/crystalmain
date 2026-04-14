@@ -71,8 +71,11 @@ export default function Editor({ content, onChange, onEditorReady }: EditorProps
   if (!editor) return null;
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white">
-      <EditorToolbar editor={editor} />
+    <div className="rounded-xl border border-gray-200 bg-white overflow-visible">
+      {/* Sticky toolbar — sits just below the sticky page header (~57px) */}
+      <div className="sticky top-[57px] z-40">
+        <EditorToolbar editor={editor} />
+      </div>
       <EditorContent editor={editor} />
     </div>
   );
