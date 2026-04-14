@@ -268,7 +268,7 @@ export default function HomepageEditorPage() {
                   </div>
                   <div>
                     <Label>Link URL (optional)</Label>
-                    <input className={inputClass} value={item.href || ""} placeholder="/web-design or https://..." onChange={(e) => {
+                    <input className={inputClass} value={item.href || ""} placeholder="e.g. /web-design-nj" onChange={(e) => {
                       const items = [...config.services.items];
                       items[i] = { ...items[i], href: e.target.value };
                       setServices({ items });

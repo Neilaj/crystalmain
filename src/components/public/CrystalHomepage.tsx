@@ -447,7 +447,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
                 image={svc.imageUrl}
                 title={svc.title}
                 description={svc.description}
-                href={svc.href || undefined}
+                href={svc.href ? (svc.href.startsWith("http") || svc.href.startsWith("/") ? svc.href : `/${svc.href}`) : undefined}
               />
             ))}
           </div>
