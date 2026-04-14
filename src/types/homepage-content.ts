@@ -17,6 +17,7 @@ export interface HomepageContent {
       title: string;
       description: string;
       imageUrl: string;
+      href?: string;
     }>;
   };
   parsley: {

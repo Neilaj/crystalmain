@@ -257,20 +257,30 @@ export default function HomepageEditorPage() {
                     setServices({ items });
                   }} />
                 </div>
-                <div>
-                  <Label>Image URL</Label>
-                  <input className={inputClass} value={item.imageUrl} onChange={(e) => {
-                    const items = [...config.services.items];
-                    items[i] = { ...items[i], imageUrl: e.target.value };
-                    setServices({ items });
-                  }} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Image URL</Label>
+                    <input className={inputClass} value={item.imageUrl} onChange={(e) => {
+                      const items = [...config.services.items];
+                      items[i] = { ...items[i], imageUrl: e.target.value };
+                      setServices({ items });
+                    }} />
+                  </div>
+                  <div>
+                    <Label>Link URL (optional)</Label>
+                    <input className={inputClass} value={item.href || ""} placeholder="/web-design or https://..." onChange={(e) => {
+                      const items = [...config.services.items];
+                      items[i] = { ...items[i], href: e.target.value };
+                      setServices({ items });
+                    }} />
+                  </div>
                 </div>
               </div>
             ))}
             <button
               type="button"
               onClick={() => setServices({
-                items: [...config.services.items, { tag: "New", title: "New Service", description: "", imageUrl: "" }],
+                items: [...config.services.items, { tag: "New", title: "New Service", description: "", imageUrl: "", href: "" }],
               })}
               className="w-full rounded-lg border-2 border-dashed border-gray-200 py-3 text-sm font-medium text-gray-500 hover:border-red-300 hover:text-red-600"
             >

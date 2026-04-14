@@ -65,23 +65,19 @@ function ServiceCard({
   description,
   tag,
   delay,
+  href,
 }: {
   image: string;
   title: string;
   description: string;
   tag: string;
   delay: number;
+  href?: string;
 }) {
   const { ref, inView } = useInView(0.1);
 
-  return (
-    <div
-      ref={ref}
-      className={`service-card-light group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-700 hover:shadow-xl hover:-translate-y-1 ${
-        inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-      }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+  const inner = (
+    <>
       <div className="relative h-52 overflow-hidden">
         <Image
           src={image}
@@ -96,9 +92,39 @@ function ServiceCard({
         </span>
       </div>
       <div className="p-6">
-        <h3 className="mb-2 text-lg font-bold text-gray-900">{title}</h3>
+        <h3 className="mb-2 text-lg font-bold text-gray-900 flex items-center gap-2">
+          {title}
+          {href && (
+            <svg className="h-4 w-4 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            </svg>
+          )}
+        </h3>
         <p className="text-sm leading-relaxed text-gray-500">{description}</p>
       </div>
+    </>
+  );
+
+  const cardClass = `service-card-light group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-700 hover:shadow-xl hover:-translate-y-1 ${
+    inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+  } ${href ? "cursor-pointer" : ""}`;
+
+  return href ? (
+    <a
+      ref={ref as React.Ref<HTMLAnchorElement>}
+      href={href}
+      className={cardClass}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {inner}
+    </a>
+  ) : (
+    <div
+      ref={ref}
+      className={cardClass}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {inner}
     </div>
   );
 }
@@ -421,6 +447,7 @@ export default function CrystalHomepage({ headerNav = [], footerNav = [], homepa
                 image={svc.imageUrl}
                 title={svc.title}
                 description={svc.description}
+                href={svc.href || undefined}
               />
             ))}
           </div>
