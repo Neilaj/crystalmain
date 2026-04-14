@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ResizableImage } from "./ImageExtension";
@@ -59,10 +60,13 @@ export default function Editor({ content, onChange, onEditorReady }: EditorProps
     },
   });
 
-  // Notify parent when editor is ready
-  if (editor && onEditorReady) {
-    onEditorReady(editor);
-  }
+  // Notify parent once when editor instance is available
+  useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
 
   if (!editor) return null;
 

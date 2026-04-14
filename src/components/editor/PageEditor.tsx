@@ -93,11 +93,17 @@ export default function PageEditor({ page, isNew }: PageEditorProps) {
     setSaving(true);
     setError("");
 
+    // Always read content directly from the editor instance — this is the
+    // source of truth and avoids any React state sync timing issues.
+    const latestContent = editorRef.current
+      ? (editorRef.current.getJSON() as Record<string, unknown>)
+      : content;
+
     const finalStatus = publishStatus || status;
     const body = {
       title,
       slug: slug || slugify(title),
-      content,
+      content: latestContent,
       contentType,
       collection: collection || null,
       hubId: hubId || null,
