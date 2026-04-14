@@ -44,3 +44,21 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   return NextResponse.json(updated);
 }
+
+// DELETE — permanently delete a submission
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { submissionId } = await request.json();
+  if (!submissionId) return NextResponse.json({ error: "submissionId required" }, { status: 400 });
+
+  const submission = await prisma.formSubmission.findFirst({
+    where: { id: submissionId, formId: id },
+  });
+  if (!submission) return NextResponse.json({ error: "Submission not found" }, { status: 404 });
+
+  await prisma.formSubmission.delete({ where: { id: submissionId } });
+  return NextResponse.json({ success: true });
+}

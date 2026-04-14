@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,6 +55,33 @@ export async function POST(req: NextRequest) {
         const err = await res.text();
         console.error("Resend error:", err);
       }
+    }
+
+    // Also save to DB so it appears in the Forms admin panel
+    try {
+      const contactForm = await prisma.contactForm.findFirst({
+        where: { slug: "contact" },
+      });
+      if (contactForm) {
+        const submissionData: Record<string, string> = {
+          name,
+          email,
+          ...(phone ? { phone } : {}),
+          ...(message ? { message } : {}),
+          source: "Ask Chrissy Chat",
+        };
+        await prisma.formSubmission.create({
+          data: {
+            formId: contactForm.id,
+            data: submissionData,
+            ipAddress: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
+            userAgent: req.headers.get("user-agent")?.slice(0, 500) || null,
+          },
+        });
+      }
+    } catch (dbErr) {
+      console.error("Failed to save Chrissy submission to DB:", dbErr);
+      // Don't fail — email already sent
     }
 
     return NextResponse.json({ success: true });

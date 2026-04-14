@@ -26,6 +26,7 @@ export default function SubmissionsPage({ params }: { params: Promise<{ id: stri
   const [selected, setSelected] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -37,6 +38,19 @@ export default function SubmissionsPage({ params }: { params: Promise<{ id: stri
       setLoading(false);
     });
   }, [id]);
+
+  async function deleteSubmission(submissionId: string) {
+    if (!confirm("Permanently delete this submission?")) return;
+    setDeleting(true);
+    await fetch(`/api/forms/${id}/submissions`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ submissionId }),
+    });
+    setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
+    setSelected(null);
+    setDeleting(false);
+  }
 
   async function updateStatus(submissionId: string, status: string) {
     await fetch(`/api/forms/${id}/submissions`, {
@@ -170,20 +184,38 @@ export default function SubmissionsPage({ params }: { params: Promise<{ id: stri
                         Archive
                       </button>
                     )}
+                    <button
+                      onClick={() => deleteSubmission(selected.id)}
+                      disabled={deleting}
+                      className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  {form.fields.map((field) => (
-                    <div key={field.name}>
-                      <label className="block text-xs font-medium uppercase text-gray-400">
-                        {field.label}
-                      </label>
-                      <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">
-                        {selected.data[field.name] || "—"}
-                      </p>
-                    </div>
-                  ))}
+                  {(() => {
+                    // Build a label map from form fields
+                    const labelMap: Record<string, string> = {};
+                    form.fields.forEach((f) => { labelMap[f.name] = f.label; });
+
+                    // Show all keys from the submission data (form fields first, then extras)
+                    const formKeys = form.fields.map((f) => f.name);
+                    const extraKeys = Object.keys(selected.data).filter((k) => !formKeys.includes(k));
+                    const allKeys = [...formKeys, ...extraKeys];
+
+                    return allKeys.map((key) => (
+                      <div key={key}>
+                        <label className="block text-xs font-medium uppercase text-gray-400">
+                          {labelMap[key] || key.charAt(0).toUpperCase() + key.slice(1)}
+                        </label>
+                        <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">
+                          {selected.data[key] || "—"}
+                        </p>
+                      </div>
+                    ));
+                  })()}
                 </div>
 
                 <div className="mt-6 border-t border-gray-100 pt-4">
