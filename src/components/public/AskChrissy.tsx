@@ -38,7 +38,7 @@ export default function AskChrissy() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [contactSubmitted, setContactSubmitted] = useState(false);
-  const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
+  const [contactData, setContactData] = useState({ name: "", email: "", phone: "", message: "" });
   const [submittingContact, setSubmittingContact] = useState(false);
   const [pulse, setPulse] = useState(true);
   const [isLimited, setIsLimited] = useState(false);
@@ -426,8 +426,8 @@ export default function AskChrissy() {
             name: contactData.name,
             email: contactData.email,
             phone: contactData.phone,
+            message: contactData.message || "Project inquiry via Ask Chrissy chat assistant",
             source: "Ask Chrissy Chat",
-            message: "Project inquiry via Ask Chrissy chat assistant",
           },
           _loadedAt: Date.now() - 10000,
         }),
@@ -696,6 +696,16 @@ export default function AskChrissy() {
                   onChange={(e) => setContactData({ ...contactData, phone: formatPhone(e.target.value) })}
                   placeholder="(555) 000-0000"
                   className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Message <span className="text-gray-400 font-normal">(optional)</span></label>
+                <textarea
+                  value={contactData.message}
+                  onChange={(e) => setContactData({ ...contactData, message: e.target.value })}
+                  placeholder="Tell us about your project..."
+                  rows={3}
+                  className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 resize-none"
                 />
               </div>
             </div>
