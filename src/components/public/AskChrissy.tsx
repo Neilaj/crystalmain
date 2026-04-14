@@ -332,15 +332,19 @@ export default function AskChrissy() {
   // Speech-to-text via Web Speech API
   // IMPORTANT: recognition.start() MUST be called synchronously from the tap handler
   const toggleListening = useCallback(() => {
+    // ── Stop if already listening ──
     if (isListening || recognitionRef.current) {
       if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch { /* */ }
+        try { recognitionRef.current.abort(); } catch { /* */ }
       }
       recognitionRef.current = null;
       setIsListening(false);
       return;
     }
 
+    // ── Stop & fully release any playing audio ──
+    // iOS shares one audio session between speaker and mic.
+    // If the speaker audio element is holding the session, mic start silently fails.
     if (activeAudioRef.current) {
       activeAudioRef.current.pause();
       activeAudioRef.current.src = "";
@@ -351,6 +355,15 @@ export default function AskChrissy() {
       activeAudioRef.current = null;
       setSpeakingIdx(null);
     }
+    // Also reset the persistent iOS speaker element so iOS releases the audio session
+    if (speakerAudioRef.current) {
+      speakerAudioRef.current.pause();
+      speakerAudioRef.current.src = "";
+      speakerAudioRef.current.load();
+    }
+    // Discard any pending TTS blob — user chose to speak instead
+    setPendingAudioBlob(null);
+    setPendingAudioIdx(null);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -365,42 +378,51 @@ export default function AskChrissy() {
     let finalTranscript = "";
     let handled = false;
 
+    const finish = (transcript: string) => {
+      if (handled) return;
+      handled = true;
+      recognitionRef.current = null;
+      setIsListening(false);
+      setInput("");
+      if (transcript.trim()) setPendingMicText(transcript.trim());
+    };
+
     recognition.onstart = () => setIsListening(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((result: any) => result[0].transcript)
-        .join("");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const transcript = Array.from(event.results).map((r: any) => r[0].transcript).join("");
       setInput(transcript);
       finalTranscript = transcript;
-
-      if (event.results[event.results.length - 1].isFinal && !handled) {
-        handled = true;
-        recognitionRef.current = null;
-        setIsListening(false);
-        setInput("");
-        if (transcript.trim()) {
-          setPendingMicText(transcript.trim());
-        }
+      if (event.results[event.results.length - 1].isFinal) {
+        // Explicitly stop so iOS fires onend cleanly
+        try { recognition.stop(); } catch { /* */ }
+        finish(transcript);
       }
     };
 
-    recognition.onerror = () => {
-      setIsListening(false);
+    // iOS: fires when user stops speaking — force stop to get the final result
+    recognition.onspeechend = () => {
+      try { recognition.stop(); } catch { /* */ }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
+      // 'no-speech' is normal on iOS (fires even after valid speech) — don't treat as fatal
+      if (event.error === "no-speech") return;
       recognitionRef.current = null;
+      setIsListening(false);
     };
 
     recognition.onend = () => {
-      setIsListening(false);
-      if (finalTranscript.trim() && !handled) {
-        handled = true;
-        recognitionRef.current = null;
-        setInput("");
-        setPendingMicText(finalTranscript.trim());
+      // Safety net: send whatever was captured if finish() wasn't called yet
+      finish(finalTranscript);
+      // Re-prime iOS speaker element so next TTS works without user tap
+      if (speakerAudioRef.current) {
+        speakerAudioRef.current.src = SILENT_MP3;
+        speakerAudioRef.current.play().catch(() => {});
       }
-      recognitionRef.current = null;
     };
 
     try {
