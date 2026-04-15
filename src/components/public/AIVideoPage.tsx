@@ -19,14 +19,19 @@ interface AIVideoPageProps {
   navigation?: NavItem[];
 }
 
-// ─── Video data — drop your /videos/filename.mp4 paths here ───────────────
+// ─── Video data ───────────────────────────────────────────────────────────────
 const VIDEOS = [
-  { id: 1, src: "/videos/video-1.mp4", title: "Brand Story", label: "Instagram Reel", accent: "from-red-600 to-rose-500" },
-  { id: 2, src: "/videos/video-2.mp4", title: "Product Showcase", label: "TikTok", accent: "from-purple-600 to-indigo-500" },
-  { id: 3, src: "/videos/video-3.mp4", title: "Service Highlight", label: "YouTube Shorts", accent: "from-amber-500 to-orange-500" },
-  { id: 4, src: "/videos/video-4.mp4", title: "Client Results", label: "Facebook Reel", accent: "from-emerald-500 to-teal-500" },
-  { id: 5, src: "/videos/video-5.mp4", title: "Behind the Brand", label: "Instagram Story", accent: "from-pink-500 to-fuchsia-500" },
-  { id: 6, src: "/videos/video-6.mp4", title: "Call to Action", label: "Multi-Platform", accent: "from-cyan-500 to-blue-500" },
+  { id: 1,  src: "/videos/BabyAd-Fin.mp4",                    title: "Baby Brand Ad",          label: "Instagram Reel",    accent: "from-pink-500 to-rose-400" },
+  { id: 2,  src: "/videos/Camaro-Website-Fin.mp4",             title: "Automotive Showcase",    label: "YouTube Shorts",    accent: "from-red-600 to-orange-500" },
+  { id: 3,  src: "/videos/CamaroTransformer-Final.mp4",        title: "Camaro Transformer",     label: "TikTok",            accent: "from-gray-600 to-slate-500" },
+  { id: 4,  src: "/videos/CamaroTune-Final.mp4",               title: "Performance Tuning",     label: "Facebook Reel",     accent: "from-amber-500 to-yellow-400" },
+  { id: 5,  src: "/videos/Cleaning-WomenFinal-01-05-26.mp4",   title: "Cleaning Service Ad",    label: "Instagram Reel",    accent: "from-emerald-500 to-teal-400" },
+  { id: 6,  src: "/videos/Cran-Snow-Fin.mp4",                  title: "Winter Scene",           label: "Multi-Platform",    accent: "from-blue-500 to-cyan-400" },
+  { id: 7,  src: "/videos/Cry-Drining-Main-St.mp4",            title: "Crystal Studios Brand",  label: "Brand Reel",        accent: "from-red-700 to-rose-500" },
+  { id: 8,  src: "/videos/Fin-Spring-Cleanup.mp4",             title: "Spring Cleanup",         label: "Local Service Ad",  accent: "from-green-500 to-emerald-400" },
+  { id: 9,  src: "/videos/Fin-couple-snowstorm.mp4",           title: "Storm Response",         label: "Facebook Reel",     accent: "from-indigo-500 to-blue-400" },
+  { id: 10, src: "/videos/Sales-Vid-01-12-29-25.mp4",          title: "Sales Campaign",         label: "Multi-Platform",    accent: "from-purple-600 to-violet-400" },
+  { id: 11, src: "/videos/Web-SM-Marketing-01-07-26.mp4",      title: "Web & Social Marketing", label: "YouTube Shorts",    accent: "from-fuchsia-500 to-pink-400" },
 ];
 
 const PLATFORMS = [
@@ -292,7 +297,7 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
             <p className="mt-3 text-gray-400">Hover to preview · Click to watch full screen</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
             {VIDEOS.map((video) => (
               <VideoCard
                 key={video.id}
