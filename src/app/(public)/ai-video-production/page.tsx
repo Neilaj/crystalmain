@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 export default async function AIVideoProductionPage() {
   const site = await prisma.site.findFirst();
   const siteLogo = site?.logo || "";
+  const aiVideoContent = (site?.aiVideoContent ?? null) as Record<string, unknown> | null;
 
   const allNav = site
     ? await prisma.navigation.findMany({
@@ -35,6 +36,7 @@ export default async function AIVideoProductionPage() {
     <AIVideoPage
       siteLogo={siteLogo}
       navigation={allNav}
+      aiVideoContent={aiVideoContent}
     />
   );
 }

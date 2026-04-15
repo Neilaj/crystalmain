@@ -60,6 +60,9 @@ model Site {
   // Homepage content (editable from admin)
   homepageContent Json?
 
+  // AI Video page content (editable from admin)
+  aiVideoContent Json?
+
   // Enabled modules/features
   enabledFeatures String[] @default(["contact-form"])
 

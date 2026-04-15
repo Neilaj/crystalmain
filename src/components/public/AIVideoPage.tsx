@@ -17,6 +17,7 @@ interface NavItem {
 interface AIVideoPageProps {
   siteLogo?: string | null;
   navigation?: NavItem[];
+  aiVideoContent?: Record<string, unknown> | null;
 }
 
 // ─── Video data ───────────────────────────────────────────────────────────────
@@ -209,8 +210,23 @@ function VideoLightbox({ video, onClose }: { video: typeof VIDEOS[0]; onClose: (
   );
 }
 
-export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPageProps) {
+// Merge DB content over the hardcoded defaults
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mergeContent(db: Record<string, unknown> | null | undefined): any {
+  if (!db) return { hero: {}, showcase: {}, videos: VIDEOS, benefits: [], process: { steps: [] }, cta: {} };
+  return {
+    hero:     { ...db.hero     ?? {} },
+    showcase: { ...db.showcase ?? {} },
+    videos:   (db.videos as typeof VIDEOS | undefined) ?? VIDEOS,
+    benefits: (db.benefits as unknown[] | undefined) ?? [],
+    process:  { ...(db.process as Record<string, unknown> ?? {}), steps: ((db.process as Record<string, unknown>)?.steps as unknown[]) ?? [] },
+    cta:      { ...db.cta ?? {} },
+  };
+}
+
+export default function AIVideoPage({ siteLogo, navigation = [], aiVideoContent }: AIVideoPageProps) {
   const [activeVideo, setActiveVideo] = useState<typeof VIDEOS[0] | null>(null);
+  const c = mergeContent(aiVideoContent);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -232,18 +248,15 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
             </span>
-            <span className="text-xs font-semibold tracking-wide text-red-300 uppercase">AI-Powered Video Production</span>
+            <span className="text-xs font-semibold tracking-wide text-red-300 uppercase">{c.hero.badge || "AI-Powered Video Production"}</span>
           </div>
 
           <h1 className="mb-6 text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-            Stop the Scroll.{" "}
-            <span className="bg-gradient-to-r from-red-400 via-rose-400 to-red-300 bg-clip-text text-transparent">
-              Start Converting.
-            </span>
+            {c.hero.headline || "Stop the Scroll. Start Converting."}
           </h1>
 
           <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-gray-400 sm:text-xl">
-            We produce AI-generated video content that stops thumbs mid-scroll, builds brand authority, and drives real business results — on every platform your customers live on.
+            {c.hero.subtext || "We produce AI-generated video content that stops thumbs mid-scroll, builds brand authority, and drives real business results — on every platform your customers live on."}
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -270,10 +283,10 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
           {/* Stats row */}
           <div className="mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4">
             {[
-              { value: "3×", label: "Higher Engagement" },
-              { value: "10×", label: "Faster Than Traditional" },
-              { value: "6+", label: "Platform Formats" },
-              { value: "48h", label: "Revision Turnaround" },
+              { value: c.hero.stat1value || "3×",  label: c.hero.stat1label || "Higher Engagement" },
+              { value: c.hero.stat2value || "10×", label: c.hero.stat2label || "Faster Than Traditional" },
+              { value: c.hero.stat3value || "6+",  label: c.hero.stat3label || "Platform Formats" },
+              { value: c.hero.stat4value || "48h", label: c.hero.stat4label || "Revision Turnaround" },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
                 <p className="text-3xl font-black text-white">{stat.value}</p>
@@ -298,7 +311,7 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
-            {VIDEOS.map((video) => (
+            {(c.videos?.length ? c.videos : VIDEOS).map((video: typeof VIDEOS[0]) => (
               <VideoCard
                 key={video.id}
                 video={video}
@@ -343,13 +356,15 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {BENEFITS.map((b) => (
+            {(c.benefits?.length ? c.benefits : BENEFITS).map((b: { id: number; title: string; body: string }) => (
               <div
-                key={b.title}
+                key={b.id ?? b.title}
                 className="group rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:border-red-500/30 hover:bg-red-500/5"
               >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-red-600/20 text-red-400 transition-colors group-hover:bg-red-600/30">
-                  {b.icon}
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-red-600/20 text-red-400">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
                 </div>
                 <h3 className="mb-2 text-base font-bold text-white">{b.title}</h3>
                 <p className="text-sm leading-relaxed text-gray-400">{b.body}</p>
@@ -363,20 +378,15 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
       <section className="py-20 border-t border-white/5">
         <div className="mx-auto max-w-4xl px-6">
           <div className="mb-14 text-center">
-            <h2 className="text-3xl font-black sm:text-4xl">How It Works</h2>
-            <p className="mt-3 text-gray-400">From brief to published in days, not months.</p>
+            <h2 className="text-3xl font-black sm:text-4xl">{c.process?.headline || "How It Works"}</h2>
+            <p className="mt-3 text-gray-400">{c.process?.subheadline || "From brief to published in days, not months."}</p>
           </div>
 
           <div className="space-y-6">
-            {[
-              { step: "01", title: "Strategy Call", body: "We learn your brand, your audience, and what you want people to do after watching. 30 minutes — that's all we need." },
-              { step: "02", title: "Script & Storyboard", body: "Our team writes a punchy, platform-native script and storyboards every scene. You approve before a single frame is rendered." },
-              { step: "03", title: "AI Production", body: "We run your project through our AI production pipeline — visuals, voiceover, music, captions, and cuts all dialed in for maximum retention." },
-              { step: "04", title: "Review & Deliver", body: "You get every format you need: 9:16, 1:1, 16:9. Revise anything. We deliver production-ready files and post-ready captions." },
-            ].map((s, i) => (
-              <div key={s.step} className="flex gap-6 items-start">
+            {(c.process?.steps?.length ? c.process.steps : []).map((s: { id: number; step: string; title: string; body: string }, i: number) => (
+              <div key={s.id ?? i} className="flex gap-6 items-start">
                 <div className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-red-700 to-red-900 text-sm font-black text-white">
-                  {s.step}
+                  {String(i + 1).padStart(2, "0")}
                 </div>
                 <div className="flex-1 pb-6 border-b border-white/5 last:border-0">
                   <h3 className="text-base font-bold text-white">{s.title}</h3>
@@ -397,20 +407,26 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
 
             <div className="relative z-10">
               <h2 className="text-3xl font-black sm:text-4xl lg:text-5xl">
-                Ready to Stop Being{" "}
-                <span className="bg-gradient-to-r from-red-400 to-rose-300 bg-clip-text text-transparent">
-                  Invisible Online?
-                </span>
+                {c.cta?.headline ? (
+                  c.cta.headline
+                ) : (
+                  <>
+                    Ready to Stop Being{" "}
+                    <span className="bg-gradient-to-r from-red-400 to-rose-300 bg-clip-text text-transparent">
+                      Invisible Online?
+                    </span>
+                  </>
+                )}
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-gray-400">
-                Your competitors are already posting video. The question is whether they'll keep outranking you — or whether you'll leapfrog them with AI-powered content that actually converts.
+                {c.cta?.subtext || "Your competitors are already posting video. The question is whether they'll keep outranking you — or whether you'll leapfrog them with AI-powered content that actually converts."}
               </p>
               <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
                   href="/#contact"
                   className="group inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-sm font-semibold text-white transition-all hover:bg-red-500 hover:shadow-xl hover:shadow-red-600/25"
                 >
-                  Start My AI Video Project
+                  {c.cta?.buttonText || "Start My AI Video Project"}
                   <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                   </svg>
