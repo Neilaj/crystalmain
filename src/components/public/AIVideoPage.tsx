@@ -95,8 +95,8 @@ const BENEFITS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
       </svg>
     ),
-    title: "Unlimited Revisions",
-    body: "Unlike traditional video production, AI means edits are fast and cheap. Change the script, swap visuals, update the offer — done in hours, not weeks.",
+    title: "Fast Turnaround on Changes",
+    body: "Need to update the offer, swap a visual, or tweak the script? AI production means revisions that took weeks with traditional video are done in 24–48 hours.",
   },
 ];
 
@@ -273,7 +273,7 @@ export default function AIVideoPage({ siteLogo, navigation = [] }: AIVideoPagePr
               { value: "3×", label: "Higher Engagement" },
               { value: "10×", label: "Faster Than Traditional" },
               { value: "6+", label: "Platform Formats" },
-              { value: "∞", label: "Revisions Included" },
+              { value: "48h", label: "Revision Turnaround" },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
                 <p className="text-3xl font-black text-white">{stat.value}</p>
