@@ -111,6 +111,7 @@ export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
           "AI-generated social media videos that stop the scroll. Thumb-stopping content at scale — reels, shorts, and stories that convert.",
         imageUrl:
           "https://images.unsplash.com/photo-1626379953822-baec19c3accd?w=600&h=400&fit=crop",
+        href: "/ai-video-production",
       },
       {
         tag: "Strategy",
