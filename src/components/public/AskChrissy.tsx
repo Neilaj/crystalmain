@@ -50,6 +50,8 @@ export default function AskChrissy() {
   const [pendingAudioBlob, setPendingAudioBlob] = useState<Blob | null>(null);
   const [pendingAudioIdx, setPendingAudioIdx] = useState<number | null>(null);
   const [isIOS, setIsIOS] = useState(false);
+  // Ref so sendMessage (useCallback) can read the current value without stale closure
+  const isIOSRef = useRef(false);
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   // Persistent audio element for iOS speaker routing
   const speakerAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -71,7 +73,9 @@ export default function AskChrissy() {
 
   // On mount: detect iOS and check for active cooldown
   useEffect(() => {
-    setIsIOS(/iPhone|iPad|iPod/i.test(navigator.userAgent));
+    const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    isIOSRef.current = ios;
+    setIsIOS(ios);
     const resetAt = getCooldownUntil();
     if (resetAt && Date.now() < resetAt) {
       setIsLimited(true);
@@ -276,7 +280,7 @@ export default function AskChrissy() {
       }
 
       // Fetch TTS audio if user used mic — desktop only (iOS skips TTS entirely)
-      if (fromMic && cleanText && !isIOS) {
+      if (fromMic && cleanText && !isIOSRef.current) {
         const msgIdx = newMessages.length;
         try {
           const ttsRes = await fetch("/api/ai/speak", {
