@@ -493,12 +493,10 @@ export default function AskChrissy() {
         {pulse && (
           <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30" />
         )}
-        <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-          </svg>
+        <span className="relative flex h-8 w-8 overflow-hidden rounded-full bg-white/20">
+          <img src="/images/neha-mid.png" alt="Crystal" className="h-full w-full object-cover object-top" />
         </span>
-        <span className="relative text-sm font-semibold">Ask Chrissy</span>
+        <span className="relative text-sm font-semibold">Ask Crystal</span>
       </button>
     );
   }
@@ -509,11 +507,11 @@ export default function AskChrissy() {
       <div className="fixed inset-x-0 bottom-0 z-50 mx-auto flex h-[100dvh] max-h-[520px] w-full max-w-[400px] flex-col overflow-hidden rounded-t-2xl border border-gray-200 bg-white shadow-2xl shadow-black/10 sm:bottom-6 sm:inset-x-auto sm:right-6 sm:left-auto sm:mx-0 sm:h-[520px] sm:rounded-2xl">
         {/* Header */}
         <div className="flex items-center gap-3 bg-gradient-to-r from-red-800 to-red-700 px-4 py-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-            <span className="text-lg">💎</span>
+          <div className="flex h-9 w-9 overflow-hidden rounded-full bg-white/20 backdrop-blur-sm">
+            <img src="/images/neha-mid.png" alt="Crystal" className="h-full w-full object-cover object-top" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-bold text-white">Ask Chrissy</h3>
+            <h3 className="text-sm font-bold text-white">Ask Crystal</h3>
             <div className="flex items-center gap-1.5">
               <div className="h-1.5 w-1.5 rounded-full bg-green-300 animate-pulse" />
               <p className="text-xs text-white/70">Crystal Studios · Online now</p>
@@ -534,7 +532,7 @@ export default function AskChrissy() {
           {messages.length === 0 && (
             <div className="space-y-3">
               <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-white px-4 py-3 text-sm text-gray-700 shadow-sm border border-gray-100">
-                Hey! I&apos;m Chrissy from Crystal Studios. What can I help you build today? 💎
+                Hey! I&apos;m Crystal from Crystal Studios. What can I help you build today? 💎
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {quickActions.map((q) => (

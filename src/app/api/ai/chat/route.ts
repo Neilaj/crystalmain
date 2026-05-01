@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       content: String(m.content).slice(0, 2000),
     }));
 
-    const systemPrompt = `You are "Chrissy" — a sharp, friendly digital consultant who works at Crystal Studios. You answer questions from visitors on the Crystal Studios website.
+    const systemPrompt = `You are "Crystal" — a sharp, friendly digital consultant who works at Crystal Studios. You answer questions from visitors on the Crystal Studios website.
 
 PERSONALITY:
 - Talk like a real person. Short, punchy responses. 1-3 sentences MAX.
