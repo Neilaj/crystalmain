@@ -49,6 +49,7 @@ export default function AskChrissy() {
   const [isListening, setIsListening] = useState(false);
   const [pendingAudioBlob, setPendingAudioBlob] = useState<Blob | null>(null);
   const [pendingAudioIdx, setPendingAudioIdx] = useState<number | null>(null);
+  const [isIOS, setIsIOS] = useState(false);
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
   // Persistent audio element for iOS speaker routing
   const speakerAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -68,8 +69,9 @@ export default function AskChrissy() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // On mount: check if a sitewide cooldown is still active
+  // On mount: detect iOS and check for active cooldown
   useEffect(() => {
+    setIsIOS(/iPhone|iPad|iPod/i.test(navigator.userAgent));
     const resetAt = getCooldownUntil();
     if (resetAt && Date.now() < resetAt) {
       setIsLimited(true);
@@ -273,8 +275,8 @@ export default function AskChrissy() {
         setShowContactForm(true);
       }
 
-      // Fetch TTS audio if user used mic
-      if (fromMic && cleanText) {
+      // Fetch TTS audio if user used mic — desktop only (iOS skips TTS entirely)
+      if (fromMic && cleanText && !isIOS) {
         const msgIdx = newMessages.length;
         try {
           const ttsRes = await fetch("/api/ai/speak", {
@@ -565,7 +567,7 @@ export default function AskChrissy() {
                     </span>
                   )}
                 </div>
-                {msg.role === "assistant" && msg.content && (
+                {msg.role === "assistant" && msg.content && !isIOS && (
                   <button
                     onClick={() => speakMessage(msg.content, i)}
                     className={`mt-1 flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] transition-all ${
