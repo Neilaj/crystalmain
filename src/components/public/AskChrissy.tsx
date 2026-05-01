@@ -675,17 +675,19 @@ export default function AskChrissy() {
         </div>
       </div>
 
-      {/* Contact Modal */}
+      {/* Contact Modal — bottom sheet on mobile, centered on desktop */}
       {showContactForm && !contactSubmitted && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="mx-4 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div className="bg-gradient-to-r from-red-800 to-red-700 px-6 py-5">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full sm:mx-4 sm:max-w-md flex flex-col max-h-[90dvh] overflow-hidden rounded-t-2xl sm:rounded-2xl bg-white shadow-2xl">
+            {/* Pinned header */}
+            <div className="flex-shrink-0 bg-gradient-to-r from-red-800 to-red-700 px-6 py-4">
               <h3 className="text-lg font-bold text-white">Start a Project</h3>
-              <p className="mt-1 text-sm text-white/70">
+              <p className="mt-0.5 text-sm text-white/70">
                 Drop your info and we&apos;ll reach out within 24 hours.
               </p>
             </div>
-            <div className="space-y-4 px-6 py-5">
+            {/* Scrollable form body */}
+            <div className="flex-1 overflow-y-auto space-y-4 px-6 py-5">
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
                 <input
@@ -694,7 +696,6 @@ export default function AskChrissy() {
                   onChange={(e) => setContactData({ ...contactData, name: e.target.value })}
                   placeholder="Your name"
                   className="w-full rounded-lg border border-gray-200 px-3.5 py-2.5 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                  autoFocus
                 />
               </div>
               <div>
@@ -728,7 +729,8 @@ export default function AskChrissy() {
                 />
               </div>
             </div>
-            <div className="flex gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4">
+            {/* Pinned buttons */}
+            <div className="flex-shrink-0 flex gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4">
               <button
                 onClick={() => setShowContactForm(false)}
                 className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
